@@ -1,0 +1,154 @@
+package com.fintech.lxf.ui.activity
+
+import android.app.AlertDialog
+import android.content.Intent
+import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
+import com.fintech.lxf.R
+import com.fintech.lxf.base.BaseActivity
+import com.fintech.lxf.db.DB
+import com.fintech.lxf.db.User
+import com.fintech.lxf.helper.*
+import com.fintech.lxf.service.init.AlipayAccessibilityService
+import com.fintech.lxf.service.init.BaseAccessibilityService
+import com.fintech.lxf.service.init.WechatAccessibilityService
+import io.reactivex.Observable
+import io.reactivex.Observer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_init.*
+import java.io.File
+
+class InitActivity : BaseActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_init)
+
+        SPHelper.getInstance().init(this)
+        
+        btnAli.setOnClickListener { startAli() }
+        btnWeChat.setOnClickListener { startWeChat() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        getDataFromSql()
+
+        val accessibilitySettingsOn = AccessibilityHelper.isAccessibilitySettingsOn(applicationContext, AlipayAccessibilityService::class.java)
+        val accessibilitySettingsOn_wechat = AccessibilityHelper.isAccessibilitySettingsOn(applicationContext, WechatAccessibilityService::class.java)
+        if (!accessibilitySettingsOn || !accessibilitySettingsOn_wechat) {
+            AlertDialog.Builder(this)
+                    .setMessage("请先打开支付宝和微信辅助插件。")
+                    .setCancelable(false)
+                    .setPositiveButton("去打开"){_,_ ->
+                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                        startActivity(intent)
+                    }
+                    .setNegativeButton("取消"){ _,_ ->
+                        finish()
+                    }
+                    .show()
+        }
+    }
+
+    private fun getDataFromSql() {
+        Observable
+                .create<User> { emitter ->
+                    val ali_last = DB.queryLast(this, BaseAccessibilityService.TYPE_ALI)
+                    val wechat_last = DB.queryLast(this, BaseAccessibilityService.TYPE_WeChat)
+                    if (ali_last != null)
+                        emitter.onNext(ali_last)
+                    if (wechat_last != null)
+                        emitter.onNext(wechat_last)
+
+                    emitter.onComplete()
+                }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<User> {
+                    internal var d: Disposable? = null
+                    override fun onSubscribe(d: Disposable) {
+                        this.d = d
+                    }
+
+                    override fun onNext(last: User) {
+                        when(last.type){
+                            BaseAccessibilityService.TYPE_ALI ->{
+                                et_ali_account.setText(last.account)
+                                et_ali_pos.setText(last.pos_curr.toString())
+                                et_ali_total.setText(last.pos_end.toString())
+                                et_ali_offset.setText(last.offset.toString())
+                            }
+                            BaseAccessibilityService.TYPE_WeChat ->{
+                                et_wx_account.setText(last.account)
+                                et_wx_pos.setText(last.pos_curr.toString())
+                                et_wx_total.setText(last.pos_end.toString())
+                                et_wx_offset.setText(last.offset.toString())
+                            }
+
+                        }
+                    }
+
+                    override fun onError(e: Throwable) {
+                        e.printStackTrace()
+                        d?.dispose()
+                    }
+
+                    override fun onComplete() {
+                        d?.dispose()
+                    }
+                })
+    }
+
+    private fun startAli() {
+            val acc = et_ali_account.text.toString().trim()
+            val pos = et_ali_pos.text.toString().trim().toIntOrNull()?:1
+            val offset = et_ali_offset.text.toString().trim().toIntOrNull()?:0
+            val beishu = 100
+            val end = et_ali_total.text.toString().trim().toIntOrNull()?:300000
+
+            SPHelper.getInstance().putString(AliPayUI.acc, acc)
+            SPHelper.getInstance().putInt(AliPayUI.posV, pos)
+            SPHelper.getInstance().putInt(AliPayUI.startV, pos)
+            SPHelper.getInstance().putInt(AliPayUI.endV, end)
+            SPHelper.getInstance().putInt(AliPayUI.offsetV, offset)
+            SPHelper.getInstance().putInt(AliPayUI.beishuV, beishu)
+
+            AliPayUI.steep = 1
+
+            val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/"
+            val file = File(filePath)
+            if (!file.exists()) {
+                file.mkdir()
+            }
+            Utils.launchAlipayAPP(this)
+    }
+
+    private fun startWeChat() {
+            val acc = et_wx_account.text.toString().trim()
+            val pos = et_wx_pos.text.toString().trim().toIntOrNull()?:1
+            val offset = et_wx_offset.text.toString().trim().toIntOrNull()?:0
+            val beishu = 100
+            val end = et_wx_total.text.toString().trim().toIntOrNull()?:300000
+
+            SPHelper.getInstance().putString(WechatUI.acc, acc)
+            SPHelper.getInstance().putInt(WechatUI.posV, pos)
+            SPHelper.getInstance().putInt(WechatUI.startV, pos)
+            SPHelper.getInstance().putInt(WechatUI.endV, end)
+            SPHelper.getInstance().putInt(WechatUI.offsetV, offset)
+            SPHelper.getInstance().putInt(WechatUI.beishuV, beishu)
+
+            WechatUI.steep = 1
+
+            val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/"
+            val file = File(filePath)
+            if (!file.exists()) {
+                file.mkdir()
+            }
+            Utils.launchWechatAPP(this)
+    }
+}
