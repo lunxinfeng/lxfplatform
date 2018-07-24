@@ -24,6 +24,12 @@ class MainActivity : BaseActivity(), EasyPermissions.PermissionCallbacks {
 
         btnInit.setOnClickListener { toActivity(InitActivity::class.java) }
         btnObserver.setOnClickListener { toActivity(ObserverActivity::class.java) }
+
+        if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(this)) {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + packageName))
+            startActivityForResult(intent, 10)
+        }
     }
 
     override fun onResume() {

@@ -28,7 +28,7 @@ class InitActivity : BaseActivity() {
         setContentView(R.layout.activity_init)
 
         SPHelper.getInstance().init(this)
-        
+
         btnAli.setOnClickListener { startAli() }
         btnWeChat.setOnClickListener { startWeChat() }
     }
@@ -37,22 +37,6 @@ class InitActivity : BaseActivity() {
         super.onResume()
 
         getDataFromSql()
-
-        val accessibilitySettingsOn = AccessibilityHelper.isAccessibilitySettingsOn(applicationContext, AlipayAccessibilityService::class.java)
-        val accessibilitySettingsOn_wechat = AccessibilityHelper.isAccessibilitySettingsOn(applicationContext, WechatAccessibilityService::class.java)
-        if (!accessibilitySettingsOn || !accessibilitySettingsOn_wechat) {
-            AlertDialog.Builder(this)
-                    .setMessage("请先打开支付宝和微信辅助插件。")
-                    .setCancelable(false)
-                    .setPositiveButton("去打开"){_,_ ->
-                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        startActivity(intent)
-                    }
-                    .setNegativeButton("取消"){ _,_ ->
-                        finish()
-                    }
-                    .show()
-        }
     }
 
     private fun getDataFromSql() {
@@ -76,14 +60,14 @@ class InitActivity : BaseActivity() {
                     }
 
                     override fun onNext(last: User) {
-                        when(last.type){
-                            BaseAccessibilityService.TYPE_ALI ->{
+                        when (last.type) {
+                            BaseAccessibilityService.TYPE_ALI -> {
                                 et_ali_account.setText(last.account)
                                 et_ali_pos.setText(last.pos_curr.toString())
                                 et_ali_total.setText(last.pos_end.toString())
                                 et_ali_offset.setText(last.offset.toString())
                             }
-                            BaseAccessibilityService.TYPE_WeChat ->{
+                            BaseAccessibilityService.TYPE_WeChat -> {
                                 et_wx_account.setText(last.account)
                                 et_wx_pos.setText(last.pos_curr.toString())
                                 et_wx_total.setText(last.pos_end.toString())
@@ -105,50 +89,80 @@ class InitActivity : BaseActivity() {
     }
 
     private fun startAli() {
-            val acc = et_ali_account.text.toString().trim()
-            val pos = et_ali_pos.text.toString().trim().toIntOrNull()?:1
-            val offset = et_ali_offset.text.toString().trim().toIntOrNull()?:0
-            val beishu = 100
-            val end = et_ali_total.text.toString().trim().toIntOrNull()?:300000
+        val accessibilitySettingsOn = AccessibilityHelper.isAccessibilitySettingsOn(applicationContext, AlipayAccessibilityService::class.java)
+        if (!accessibilitySettingsOn) {
+            AlertDialog.Builder(this)
+                    .setMessage("请先打开支付宝辅助插件。")
+                    .setCancelable(false)
+                    .setPositiveButton("去打开") { _, _ ->
+                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                        startActivity(intent)
+                    }
+                    .setNegativeButton("取消") { _, _ ->
+//                        finish()
+                    }
+                    .show()
+            return
+        }
+        val acc = et_ali_account.text.toString().trim()
+        val pos = et_ali_pos.text.toString().trim().toIntOrNull() ?: 1
+        val offset = et_ali_offset.text.toString().trim().toIntOrNull() ?: 0
+        val beishu = 100
+        val end = et_ali_total.text.toString().trim().toIntOrNull() ?: 300000
 
-            SPHelper.getInstance().putString(AliPayUI.acc, acc)
-            SPHelper.getInstance().putInt(AliPayUI.posV, pos)
-            SPHelper.getInstance().putInt(AliPayUI.startV, pos)
-            SPHelper.getInstance().putInt(AliPayUI.endV, end)
-            SPHelper.getInstance().putInt(AliPayUI.offsetV, offset)
-            SPHelper.getInstance().putInt(AliPayUI.beishuV, beishu)
+        SPHelper.getInstance().putString(AliPayUI.acc, acc)
+        SPHelper.getInstance().putInt(AliPayUI.posV, pos)
+        SPHelper.getInstance().putInt(AliPayUI.startV, pos)
+        SPHelper.getInstance().putInt(AliPayUI.endV, end)
+        SPHelper.getInstance().putInt(AliPayUI.offsetV, offset)
+        SPHelper.getInstance().putInt(AliPayUI.beishuV, beishu)
 
-            AliPayUI.steep = 1
+        AliPayUI.steep = 1
 
-            val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/"
-            val file = File(filePath)
-            if (!file.exists()) {
-                file.mkdir()
-            }
-            Utils.launchAlipayAPP(this)
+        val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/"
+        val file = File(filePath)
+        if (!file.exists()) {
+            file.mkdir()
+        }
+        Utils.launchAlipayAPP(this)
     }
 
     private fun startWeChat() {
-            val acc = et_wx_account.text.toString().trim()
-            val pos = et_wx_pos.text.toString().trim().toIntOrNull()?:1
-            val offset = et_wx_offset.text.toString().trim().toIntOrNull()?:0
-            val beishu = 100
-            val end = et_wx_total.text.toString().trim().toIntOrNull()?:300000
+        val accessibilitySettingsOn_wechat = AccessibilityHelper.isAccessibilitySettingsOn(applicationContext, WechatAccessibilityService::class.java)
+        if (!accessibilitySettingsOn_wechat) {
+            AlertDialog.Builder(this)
+                    .setMessage("请先打开微信辅助插件。")
+                    .setCancelable(false)
+                    .setPositiveButton("去打开") { _, _ ->
+                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                        startActivity(intent)
+                    }
+                    .setNegativeButton("取消") { _, _ ->
+//                        finish()
+                    }
+                    .show()
+            return
+        }
+        val acc = et_wx_account.text.toString().trim()
+        val pos = et_wx_pos.text.toString().trim().toIntOrNull() ?: 1
+        val offset = et_wx_offset.text.toString().trim().toIntOrNull() ?: 0
+        val beishu = 100
+        val end = et_wx_total.text.toString().trim().toIntOrNull() ?: 300000
 
-            SPHelper.getInstance().putString(WechatUI.acc, acc)
-            SPHelper.getInstance().putInt(WechatUI.posV, pos)
-            SPHelper.getInstance().putInt(WechatUI.startV, pos)
-            SPHelper.getInstance().putInt(WechatUI.endV, end)
-            SPHelper.getInstance().putInt(WechatUI.offsetV, offset)
-            SPHelper.getInstance().putInt(WechatUI.beishuV, beishu)
+        SPHelper.getInstance().putString(WechatUI.acc, acc)
+        SPHelper.getInstance().putInt(WechatUI.posV, pos)
+        SPHelper.getInstance().putInt(WechatUI.startV, pos)
+        SPHelper.getInstance().putInt(WechatUI.endV, end)
+        SPHelper.getInstance().putInt(WechatUI.offsetV, offset)
+        SPHelper.getInstance().putInt(WechatUI.beishuV, beishu)
 
-            WechatUI.steep = 1
+        WechatUI.steep = 1
 
-            val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/"
-            val file = File(filePath)
-            if (!file.exists()) {
-                file.mkdir()
-            }
-            Utils.launchWechatAPP(this)
+        val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/"
+        val file = File(filePath)
+        if (!file.exists()) {
+            file.mkdir()
+        }
+        Utils.launchWechatAPP(this)
     }
 }

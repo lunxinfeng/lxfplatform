@@ -326,6 +326,9 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
     }
 
     protected void stop() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            disableSelf();
+        }
         Observable
                 .create(new ObservableOnSubscribe<Integer>() {
                     @Override
