@@ -55,12 +55,17 @@ public class WechatAccessibilityService extends BaseAccessibilityService {
                 }
 
                 if ("com.tencent.mm.plugin.collect.ui.CollectCreateQRCodeUI".equals(className)) {//设置金额
+                    if (steep == 3){//steep == 3网络不好时可能会发生
+                        sure();
+                    }
                     if (steep == 1) {
                         steep = 2;
 
                         clearLocalPic();
 
-                        inputAndSure();
+                        input();
+
+                        sure();
                     }
 
 
@@ -71,7 +76,7 @@ public class WechatAccessibilityService extends BaseAccessibilityService {
 
                 } else if ("com.tencent.mm.plugin.collect.ui.CollectMainUI".equals(className)) {
 
-                    if (steep == 3) {//保存图片
+                    if (steep == 2 || steep == 3) {//保存图片
                         steep = 1;// 去往第四步  悬空
 
                         Thread.sleep(300);

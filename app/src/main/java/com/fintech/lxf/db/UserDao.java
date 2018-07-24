@@ -21,7 +21,7 @@ public interface UserDao {
     @Update
     void updateAll(User... users);
 
-    @Query("SELECT * FROM User WHERE type = :type  ORDER BY pos_curr DESC,`offset` DESC LIMIT 1")
+    @Query("SELECT * FROM User WHERE type = :type  ORDER BY `offset` DESC,pos_curr DESC LIMIT 1")
     User queryLast(int type);
 
     @Query("SELECT * FROM User WHERE type = :type")

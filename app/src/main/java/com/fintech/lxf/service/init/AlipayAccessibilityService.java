@@ -6,8 +6,10 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.fintech.lxf.helper.AliPayUI;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -28,6 +30,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
 
+//        debug(TAG, "onAccessibilityEvent: event: " + event);
         try {
             final int eventType = event.getEventType();
 
@@ -35,26 +38,30 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                 String className = event.getClassName().toString();
                 debug(TAG, "onAccessibilityEvent: ClassName: " + className);
 
-
                 int posV = getPosV();
                 int endV = getEndV();
 
                 if (posV * getbeishu() > endV) {
-                    if (getOffsetV() >= 4){
+                    if (getOffsetV() >= 4) {
                         stop();
                         return;
-                    }else{
+                    } else {
                         resetPos();
                     }
                 }
 
                 if ("com.alipay.mobile.payee.ui.PayeeQRSetMoneyActivity".equals(className)) {//设置金额
+                    if (steep == 3) {//steep == 3网络不好时可能会发生
+                        sure();
+                    }
                     if (steep == 1) {
                         steep = 2;
 
                         clearLocalPic();
 
-                        inputAndSure();
+                        input();
+
+                        sure();
                     }
 
                 } else if ("com.alipay.mobile.framework.app.ui.DialogHelper$APGenericProgressDialog".equals(className)) {//加载
@@ -64,7 +71,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
 
                 } else if ("com.alipay.mobile.payee.ui.PayeeQRActivity".equals(className)) {
 
-                    if (steep == 3) {//保存图片
+                    if (steep == 2 || steep == 3) {//保存图片
                         steep = 1;// 去往第四步  悬空
 
                         Thread.sleep(300);
@@ -102,6 +109,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                                 .delay(100, TimeUnit.MILLISECONDS)
                                 .subscribe(new Observer<Integer>() {
                                     Disposable d;
+
                                     @Override
                                     public void onSubscribe(Disposable d) {
                                         this.d = d;
@@ -147,24 +155,25 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
 //                        steep = 1;
                     }
 
-                } else if ("com.alipay.mobile.commonui.widget.APNoticePopDialog".equals(className)) {//人气大爆发
-
-                    AccessibilityNodeInfo root = getRootInActiveWindow();
-                    if (root == null) {
-                        return;
-                    }
-                    List<AccessibilityNodeInfo> open = root.findAccessibilityNodeInfosByViewId(AliPayUI.btn_ensure);
-                    if (open == null || open.size() == 0) {
-                        return;
-                    }
-                    open.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-
-                    Thread.sleep(10000);
-                    inputAndSure();
-
-                    steep = 2;
-
                 }
+//                else if ("com.alipay.mobile.commonui.widget.APNoticePopDialog".equals(className)) {//人气大爆发
+//
+//                    AccessibilityNodeInfo root = getRootInActiveWindow();
+//                    if (root == null) {
+//                        return;
+//                    }
+//                    List<AccessibilityNodeInfo> open = root.findAccessibilityNodeInfosByViewId(AliPayUI.btn_ensure);
+//                    if (open == null || open.size() == 0) {
+//                        return;
+//                    }
+//                    open.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+//
+//                    Thread.sleep(10000);
+//                    input();
+//
+//                    steep = 2;
+//
+//                }
 
             }// 页面切换
 

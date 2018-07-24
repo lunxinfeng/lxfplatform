@@ -260,7 +260,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
 
     }
 
-    public void inputAndSure() {
+    public void input() {
         AccessibilityNodeInfo root = getRootInActiveWindow();
         if (root == null) {
             return;
@@ -270,6 +270,13 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         AccessibilityNodeInfo nodeInfo = etContent.get(0);
 
         performEditText(nodeInfo, getAmount() + "");
+    }
+
+    public void sure(){
+        AccessibilityNodeInfo root = getRootInActiveWindow();
+        if (root == null) {
+            return;
+        }
 
         List<AccessibilityNodeInfo> btnNext = root.findAccessibilityNodeInfosByViewId(amount_btnSure());
         if (btnNext == null || btnNext.size() == 0) {

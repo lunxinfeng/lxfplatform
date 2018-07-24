@@ -12,8 +12,11 @@ import com.fintech.lxf.net.PERMISSIONS_GROUP
 import kotlinx.android.synthetic.main.activity_main.*
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
+import android.content.Intent
+import android.net.Uri
 
-class MainActivity : BaseActivity(),EasyPermissions.PermissionCallbacks {
+
+class MainActivity : BaseActivity(), EasyPermissions.PermissionCallbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +39,12 @@ class MainActivity : BaseActivity(),EasyPermissions.PermissionCallbacks {
             EasyPermissions.requestPermissions(this, getString(R.string.rationale_message),
                     ALL_PERMISSION, *PERMISSIONS_GROUP)
         }
-//        else{
-//            if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(this)){
-//                Utils.goPermissionSetting(this)
+//        else {
+//            if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(this)) {
+////                Utils.goPermissionSetting(this)
+//                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+//                        Uri.parse("package:" + packageName))
+//                startActivityForResult(intent, 10)
 //            }
 //        }
     }
