@@ -26,4 +26,7 @@ public interface UserDao {
 
     @Query("SELECT * FROM User WHERE type = :type")
     List<User> queryAll(int type);
+
+//    @Query("SELECT * FROM USER WHERE ")
+//    List<User> queryQrNull(int type);
 }

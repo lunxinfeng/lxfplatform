@@ -10,9 +10,9 @@ import com.fintech.lxf.base.BaseActivity
 import com.fintech.lxf.db.DB
 import com.fintech.lxf.db.User
 import com.fintech.lxf.helper.*
-import com.fintech.lxf.service.init.AlipayAccessibilityService
-import com.fintech.lxf.service.init.BaseAccessibilityService
-import com.fintech.lxf.service.init.WechatAccessibilityService
+import com.fintech.lxf.service.init2.AlipayAccessibilityService
+import com.fintech.lxf.service.init2.BaseAccessibilityService
+import com.fintech.lxf.service.init2.WechatAccessibilityService
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers

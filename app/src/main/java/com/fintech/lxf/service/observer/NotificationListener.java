@@ -8,8 +8,11 @@ import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -47,12 +50,18 @@ public final class NotificationListener extends NotificationListenerService {
         }
 
         Log.d(TAG, "onNotificationPosted: " + statusBarNotification.getNotification().tickerText);
+        Log.d(TAG, "onNotificationPosted: " + statusBarNotification.getNotification().when);
+        Date date = new Date(statusBarNotification.getNotification().when);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.CHINA);
+        Log.d(TAG, "onNotificationPosted: " + sdf.format(date));
 
         if (PACKAGES_LOWER_CASE.contains(str.toLowerCase())) {//监控 微信 and 支付宝  Notification
             sLock.lock();
             try {
                 onPostedAsync(statusBarNotification);
-            } finally {
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
                 sLock.unlock();
             }
         }
