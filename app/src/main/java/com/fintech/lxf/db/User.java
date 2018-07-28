@@ -26,6 +26,11 @@ public class User {
     public int type;//1:支付宝  2:微信
     public String deviceId;//设备id
 
+    public long saveTime;
+
+    public User() {
+        saveTime = System.currentTimeMillis();
+    }
 
     @Override
     public String toString() {

@@ -17,6 +17,10 @@ public class AliPayUI {
 
 
     // -- 个人收钱码
+    /**
+     * 首页
+     */
+    public final static  String btn_money = "com.alipay.android.phone.openplatform:id/collect_layout";
 
     /**
      * 个人收钱 - 设置金额 - 清除金额

@@ -158,4 +158,15 @@ public class Utils {
             Toast.makeText(context, "未安装微信", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public static void launchSelf(Context context) {
+        try {
+            PackageManager packageManager = context.getApplicationContext().getPackageManager();
+            Intent intent = packageManager.
+                    getLaunchIntentForPackage("com.tencent.mm");
+            context.startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(context, "未安装微信", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

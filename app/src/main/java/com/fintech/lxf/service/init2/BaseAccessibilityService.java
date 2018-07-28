@@ -587,7 +587,13 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             @Override
             public void onCompleted(GestureDescription gestureDescription) {
                 super.onCompleted(gestureDescription);
-//                Log.d(TAG, "click: " + node.getText());
+                Log.d(TAG, "click: " + node.getText());
+            }
+
+            @Override
+            public void onCancelled(GestureDescription gestureDescription) {
+                super.onCancelled(gestureDescription);
+                Log.d(TAG, "click: cancel " + node.getText());
             }
         });
     }

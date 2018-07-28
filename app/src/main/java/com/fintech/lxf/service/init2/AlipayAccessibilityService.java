@@ -1,9 +1,15 @@
 package com.fintech.lxf.service.init2;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.SystemClock;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.fintech.lxf.db.DB;
+import com.fintech.lxf.db.User;
+import com.fintech.lxf.helper.AliPayUI;
+import com.fintech.lxf.ui.activity.InitActivity;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
@@ -68,6 +74,20 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                 if (isFinish()) return;
 
                 switch (currClass) {
+                    case "com.eg.android.AlipayGphone.AlipayLogin"://首页
+                        debug(TAG, "onAccessibilityEvent: 首页: " + steep);
+//                        click(AliPayUI.btn_money);
+//                        SystemClock.sleep(200);
+                        AccessibilityNodeInfo root = getRootInActiveWindow();
+                        List<AccessibilityNodeInfo> node2 = root.findAccessibilityNodeInfosByViewId(AliPayUI.btn_money);
+                        List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("收钱");
+                        if(node == null || node.size() == 0)return;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            click(node.get(0).getParent());
+                            System.out.println(node.get(0).getParent().getViewIdResourceName());
+                            click(node.get(0).getParent().getViewIdResourceName());
+                        }
+                        break;
                     case "com.alipay.mobile.payee.ui.PayeeQRSetMoneyActivity":
                         debug(TAG, "onAccessibilityEvent: 设置金额页面: " + steep);
                         if (steep == 3) {//steep == 3网络不好时可能会发生
@@ -86,6 +106,9 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                         break;
                     case "com.alipay.mobile.payee.ui.PayeeQRActivity":
                         debug(TAG, "onAccessibilityEvent: 二维码页面: " + steep);
+                        if (steep == 1){
+                            click(qr_set());
+                        }
                         if (steep == 4 || steep == 3 || steep == 2) {//保存图片
                             steep = 4;
 
@@ -140,7 +163,19 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                             long id = DB.insert(AlipayAccessibilityService.this, users.poll());
                             debug(TAG, "=========DB========: id = " + id);
                         }else {
-                            debug(TAG, "=========DB========: list is null");
+                            long currTime = System.currentTimeMillis();
+                            User last = DB.queryLast(AlipayAccessibilityService.this,TYPE_ALI);
+                            if (last!=null){
+                                long lastTime = last.saveTime;
+                                if (currTime - lastTime > 30 *1000){
+                                    debug(TAG, "=========DB========: 半分钟未检测到新数据，重新启动系统");
+                                    Intent intent = new Intent(AlipayAccessibilityService.this, InitActivity.class);
+                                    intent.putExtra("reStart",TYPE_ALI);
+                                    AlipayAccessibilityService.this.startActivity(intent);
+                                }else{
+                                    debug(TAG, "=========DB========: list is null");
+                                }
+                            }
                         }
                     }
                 });

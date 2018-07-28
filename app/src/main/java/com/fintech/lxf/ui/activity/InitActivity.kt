@@ -22,10 +22,13 @@ import kotlinx.android.synthetic.main.activity_init.*
 import java.io.File
 
 class InitActivity : BaseActivity() {
+    private var startType = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_init)
+
+        startType = intent.getIntExtra("reStart", 0)
 
         SPHelper.getInstance().init(this)
 
@@ -83,6 +86,14 @@ class InitActivity : BaseActivity() {
                     }
 
                     override fun onComplete() {
+                        when (startType) {
+                            1 -> {
+                                btnAli.performClick()
+                            }
+                            2 -> {
+                                btnWeChat.performClick()
+                            }
+                        }
                         d?.dispose()
                     }
                 })
@@ -99,7 +110,7 @@ class InitActivity : BaseActivity() {
                         startActivity(intent)
                     }
                     .setNegativeButton("取消") { _, _ ->
-//                        finish()
+                        //                        finish()
                     }
                     .show()
             return
@@ -138,7 +149,7 @@ class InitActivity : BaseActivity() {
                         startActivity(intent)
                     }
                     .setNegativeButton("取消") { _, _ ->
-//                        finish()
+                        //                        finish()
                     }
                     .show()
             return
