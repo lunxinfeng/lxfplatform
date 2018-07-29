@@ -605,7 +605,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         Point position = new Point(rect.centerX(), rect.centerY());
         GestureDescription.Builder builder = new GestureDescription.Builder();
         Path p = new Path();
-        p.moveTo(position.x, position.y);
+        p.moveTo(position.x, position.y + 200);
         builder.addStroke(new GestureDescription.StrokeDescription(p, 0L, 100L));
         GestureDescription gesture = builder.build();
         dispatchGesture(gesture, gestureResultCallback, null);

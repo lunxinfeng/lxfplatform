@@ -17,6 +17,7 @@ import org.reactivestreams.Subscription;
 import java.io.File;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -36,7 +37,7 @@ import static com.fintech.lxf.helper.ExpansionKt.debug;
 
 
 public class AlipayAccessibilityService extends BaseAccessibilityService {
-    private List<AccessibilityEvent> events = new ArrayList<>();
+    private LinkedList<AccessibilityEvent> events = new LinkedList<>();
 
     @Override
     protected int getType() {
@@ -57,6 +58,11 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
 //                    }
 //            }
 //        }
+        switch (steep){
+            case 1:
+                if (event.getClassName().equals("com.alipay.mobile.payee.ui.PayeeQRSetMoneyActivity"))
+                break;
+        }
         parserEvent(event);
     }
 
@@ -79,13 +85,14 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
 //                        click(AliPayUI.btn_money);
 //                        SystemClock.sleep(200);
                         AccessibilityNodeInfo root = getRootInActiveWindow();
-                        List<AccessibilityNodeInfo> node2 = root.findAccessibilityNodeInfosByViewId(AliPayUI.btn_money);
+//                        List<AccessibilityNodeInfo> node2 = root.findAccessibilityNodeInfosByViewId(AliPayUI.btn_money);
                         List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("收钱");
                         if(node == null || node.size() == 0)return;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            click(node.get(0).getParent());
-                            System.out.println(node.get(0).getParent().getViewIdResourceName());
-                            click(node.get(0).getParent().getViewIdResourceName());
+//                            click(node.get(0).getParent());
+//                            System.out.println(node.get(0).getParent().getViewIdResourceName());
+//                            click(node.get(0).getParent().getViewIdResourceName());
+                            node.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
                         }
                         break;
                     case "com.alipay.mobile.payee.ui.PayeeQRSetMoneyActivity":
@@ -124,7 +131,12 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                 debug(TAG, "onAccessibilityEvent: 内容改变: " + steep);
                 if (steep == 5) {
                     steep = 1;
-                    click(qr_set());
+//                    click(qr_set());
+                    AccessibilityNodeInfo root = getRootInActiveWindow();
+                    if(root ==null ) return;
+                    List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("设置金额");
+                    if(node !=null  && node.size()>0)
+                    node.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
                 }
                 break;
             case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED:
@@ -140,7 +152,12 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                         event.getText().get(0).toString().equals("已保存到系统相册")) {//保存数据库,清除图片
                     steep = 5;
                     save();
-                    click(qr_set());
+//                    click(qr_set());
+                    AccessibilityNodeInfo root = getRootInActiveWindow();
+                    if(root ==null ) return;
+                    List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("清除金额");
+                    if(node !=null  && node.size()>0)
+                    node.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
                 }
                 break;
         }
@@ -154,6 +171,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
         db();
     }
 
+    private long lastReStart = 0;
     private void db(){
         Flowable.interval(1000,TimeUnit.MILLISECONDS)
                 .subscribe(new Consumer<Long>() {
@@ -167,7 +185,8 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                             User last = DB.queryLast(AlipayAccessibilityService.this,TYPE_ALI);
                             if (last!=null){
                                 long lastTime = last.saveTime;
-                                if (currTime - lastTime > 30 *1000){
+                                if (currTime - Math.max(lastTime,lastReStart) > 30 *1000){
+                                    lastReStart = currTime;
                                     debug(TAG, "=========DB========: 半分钟未检测到新数据，重新启动系统");
                                     Intent intent = new Intent(AlipayAccessibilityService.this, InitActivity.class);
                                     intent.putExtra("reStart",TYPE_ALI);

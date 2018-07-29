@@ -86,6 +86,7 @@ class InitActivity : BaseActivity() {
                     }
 
                     override fun onComplete() {
+                        debug(localClassName,"startType:$startType")
                         when (startType) {
                             1 -> {
                                 btnAli.performClick()
