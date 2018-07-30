@@ -45,7 +45,7 @@ public class AliPayUI {
     public final static String btn_ensure = "com.alipay.mobile.antui:id/ensure";
 
     //步骤
-    public static volatile int steep = 1;
+    public static volatile int steep = 0;
 
     public static String getPicPath() {
         String dcim_path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();

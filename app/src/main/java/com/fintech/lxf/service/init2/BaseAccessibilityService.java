@@ -362,26 +362,26 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             return;
         AccessibilityNodeInfo root = getRootInActiveWindow();
         if (root == null){
-            final int finalNum = num;
-            Single.timer(500,TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Long>() {
-                        @Override
-                        public void accept(Long aLong) throws Exception {
-                            click(view, finalNum);
-                        }
-                    });
+//            final int finalNum = num;
+//            Single.timer(500,TimeUnit.MILLISECONDS)
+//                    .subscribe(new Consumer<Long>() {
+//                        @Override
+//                        public void accept(Long aLong) throws Exception {
+//                            click(view, finalNum);
+//                        }
+//                    });
             return;
         }
         List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByViewId(view);
         if (node == null || node.size() == 0) {
-            final int finalNum = num;
-            Single.timer(500,TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Long>() {
-                        @Override
-                        public void accept(Long aLong) throws Exception {
-                            click(view, finalNum);
-                        }
-                    });
+//            final int finalNum = num;
+//            Single.timer(500,TimeUnit.MILLISECONDS)
+//                    .subscribe(new Consumer<Long>() {
+//                        @Override
+//                        public void accept(Long aLong) throws Exception {
+//                            click(view, finalNum);
+//                        }
+//                    });
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && getType() == TYPE_WeChat) {

@@ -20,6 +20,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_init.*
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 class InitActivity : BaseActivity() {
     private var startType = 0
@@ -56,6 +57,36 @@ class InitActivity : BaseActivity() {
                 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext { last ->
+                    when (last.type) {
+                        BaseAccessibilityService.TYPE_ALI -> {
+                            et_ali_account.setText(last.account)
+                            et_ali_pos.setText(last.pos_curr.toString())
+                            et_ali_total.setText(last.pos_end.toString())
+                            et_ali_offset.setText(last.offset.toString())
+                        }
+                        BaseAccessibilityService.TYPE_WeChat -> {
+                            et_wx_account.setText(last.account)
+                            et_wx_pos.setText(last.pos_curr.toString())
+                            et_wx_total.setText(last.pos_end.toString())
+                            et_wx_offset.setText(last.offset.toString())
+                        }
+
+                    }
+                }
+                .delay(2000,TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete {
+                    debug(localClassName,"startType:$startType")
+                    when (startType) {
+                        1 -> {
+                            btnAli.performClick()
+                        }
+                        2 -> {
+                            btnWeChat.performClick()
+                        }
+                    }
+                }
                 .subscribe(object : Observer<User> {
                     internal var d: Disposable? = null
                     override fun onSubscribe(d: Disposable) {
@@ -63,21 +94,7 @@ class InitActivity : BaseActivity() {
                     }
 
                     override fun onNext(last: User) {
-                        when (last.type) {
-                            BaseAccessibilityService.TYPE_ALI -> {
-                                et_ali_account.setText(last.account)
-                                et_ali_pos.setText(last.pos_curr.toString())
-                                et_ali_total.setText(last.pos_end.toString())
-                                et_ali_offset.setText(last.offset.toString())
-                            }
-                            BaseAccessibilityService.TYPE_WeChat -> {
-                                et_wx_account.setText(last.account)
-                                et_wx_pos.setText(last.pos_curr.toString())
-                                et_wx_total.setText(last.pos_end.toString())
-                                et_wx_offset.setText(last.offset.toString())
-                            }
 
-                        }
                     }
 
                     override fun onError(e: Throwable) {
@@ -86,15 +103,6 @@ class InitActivity : BaseActivity() {
                     }
 
                     override fun onComplete() {
-                        debug(localClassName,"startType:$startType")
-                        when (startType) {
-                            1 -> {
-                                btnAli.performClick()
-                            }
-                            2 -> {
-                                btnWeChat.performClick()
-                            }
-                        }
                         d?.dispose()
                     }
                 })
@@ -129,7 +137,7 @@ class InitActivity : BaseActivity() {
         SPHelper.getInstance().putInt(AliPayUI.offsetV, offset)
         SPHelper.getInstance().putInt(AliPayUI.beishuV, beishu)
 
-        AliPayUI.steep = 1
+        AliPayUI.steep = 0
 
         val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/"
         val file = File(filePath)
@@ -168,7 +176,7 @@ class InitActivity : BaseActivity() {
         SPHelper.getInstance().putInt(WechatUI.offsetV, offset)
         SPHelper.getInstance().putInt(WechatUI.beishuV, beishu)
 
-        WechatUI.steep = 1
+        WechatUI.steep = 0
 
         val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/"
         val file = File(filePath)

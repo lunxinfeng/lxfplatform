@@ -23,6 +23,8 @@ public class User {
     @ColumnInfo
     public int multiple;//倍数
 
+    public float amount;
+
     public int type;//1:支付宝  2:微信
     public String deviceId;//设备id
 
