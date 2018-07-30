@@ -9,6 +9,8 @@ public class User {
 
     @NonNull
     public String account = "";//账号
+    public double amount;
+    public String qr_str;//二维码长串
 
     public int pos_curr;//当前pos
 
@@ -16,14 +18,12 @@ public class User {
     public int pos_end;//总共pos
 
     @ColumnInfo
-    public String qr_str;//二维码长串
 
     public int offset;//偏移
 
     @ColumnInfo
     public int multiple;//倍数
 
-    public float amount;
 
     public int type;//1:支付宝  2:微信
     public String deviceId;//设备id

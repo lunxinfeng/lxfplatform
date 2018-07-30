@@ -239,6 +239,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             user.pos_end = getEndV();
             user.qr_str = s;
             user.type = getType();
+            user.amount = (user.pos_curr * user.multiple - user.offset) / 100.0;
 
             users.offer(user);
 //            long id = DB.insert(this, user);
@@ -255,6 +256,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             user.pos_end = getEndV();
             user.qr_str = null;
             user.type = getType();
+            user.amount = (user.pos_curr * user.multiple - user.offset) / 100.0;
 
             users.offer(user);
 //            long id = DB.insert(this, user);
@@ -517,9 +519,6 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
 //    }
 
     protected void stop() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            disableSelf();
-        }
         Observable
                 .create(new ObservableOnSubscribe<Integer>() {
                     @Override
@@ -531,6 +530,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                     }
                 })
                 .subscribeOn(Schedulers.io())
+                .delay(2000,TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Integer>() {
                     Disposable d;
@@ -576,6 +576,9 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                     @Override
                     public void onComplete() {
                         d.dispose();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            disableSelf();
+                        }
                     }
                 });
     }
