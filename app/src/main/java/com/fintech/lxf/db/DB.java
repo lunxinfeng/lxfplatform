@@ -18,19 +18,12 @@ public class DB {
         return AppDatabase.getInstance(context).userDao().queryAll(type);
     }
 
-    public static void deleteAll(Context context, User... users){
-        AppDatabase.getInstance(context).userDao().delAll(users);
+    public static int deleteAll(Context context, User... users){
+        return AppDatabase.getInstance(context).userDao().delAll(users);
     }
 
-//    public static long insert(Context context, User user){
-//        return MatchPayDatabase.getInstance(context).userDao().insertUser(user);
-//    }
-//
-//    public static User queryLast(Context context){
-//        return MatchPayDatabase.getInstance(context).userDao().queryLast();
-//    }
-//
-//    public static void deleteAll(Context context,User... users){
-//        MatchPayDatabase.getInstance(context).userDao().delAll(users);
-//    }
+    public static List<User> queryQrNull(Context context, int type){
+        return AppDatabase.getInstance(context).userDao().queryQrNull(type);
+    }
+
 }

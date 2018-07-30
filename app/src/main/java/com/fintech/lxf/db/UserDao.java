@@ -16,7 +16,7 @@ public interface UserDao {
     long insertUser(User user);
 
     @Delete
-    void delAll(User... users);
+    int delAll(User... users);
 
     @Update
     void updateAll(User... users);
@@ -27,6 +27,6 @@ public interface UserDao {
     @Query("SELECT * FROM User WHERE type = :type")
     List<User> queryAll(int type);
 
-//    @Query("SELECT * FROM USER WHERE ")
-//    List<User> queryQrNull(int type);
+    @Query("SELECT * FROM USER WHERE type = :type AND qr_str IS NULL")
+    List<User> queryQrNull(int type);
 }

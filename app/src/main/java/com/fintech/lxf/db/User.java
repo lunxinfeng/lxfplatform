@@ -18,7 +18,6 @@ public class User {
     public int pos_end;//总共pos
 
     @ColumnInfo
-
     public int offset;//偏移
 
     @ColumnInfo

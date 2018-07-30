@@ -1,8 +1,12 @@
 package com.fintech.lxf.service.init2;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.SystemClock;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -24,12 +28,15 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
 import io.reactivex.FlowableSubscriber;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -117,11 +124,19 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                             lastSteep = steep;
                             steep = 4;
 
-                            clearLocalPic();
-                            File file = getPicFile();
-                            File[] files = file.listFiles();
-                            debug(TAG, "本地图片数量：" + files.length);
-                            click(qr_save());
+                            AccessibilityNodeInfo root = getRootInActiveWindow();
+                            if (root != null){
+                                List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("清除金额");
+                                if (node != null && node.size() > 0){
+
+
+                                    clearLocalPic();
+                                    File file = getPicFile();
+                                    File[] files = file.listFiles();
+                                    debug(TAG, "本地图片数量：" + files.length);
+                                    click(qr_save());
+                                }
+                            }
                         }
                         break;
                 }
@@ -180,10 +195,39 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
     private int reStartNum = 0;
 
     private void db() {
-        disposable = Flowable.interval(1000, TimeUnit.MILLISECONDS)
-                .subscribe(new Consumer<Long>() {
+        Observable.interval(1000, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete(new Action() {
                     @Override
-                    public void accept(Long aLong) throws Exception {
+                    public void run() throws Exception {
+                        AlertDialog dialog = new AlertDialog.Builder(AlipayAccessibilityService.this)
+                                .setMessage("程序出现异常，自动重启5次未解决，请手动重启。")
+                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .create();
+                        if (Build.VERSION.SDK_INT >= 26)
+                            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+                        else
+                            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+
+                        dialog.show();
+                    }
+                })
+                .observeOn(Schedulers.io())
+                .subscribe(new Observer<Long>() {
+                    Disposable d;
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        this.d = d;
+                    }
+
+                    @Override
+                    public void onNext(Long aLong) {
                         if (users.size() > 0) {
                             long id = DB.insert(AlipayAccessibilityService.this, users.poll());
                             debug(TAG, "=========DB========: id = " + id);
@@ -197,8 +241,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                                     if (++reStartNum > 5) {
                                         debug(TAG, "已连续重启5次，不能正常运行，请手动重启。");
                                         disableSelf();
-                                        if (disposable!=null)
-                                            disposable.dispose();
+                                        onComplete();
                                         return;
                                     }
                                     lastReStart = currTime;
@@ -212,8 +255,17 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                             }
                         }
                     }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        d.dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        d.dispose();
+                    }
                 });
     }
-
-    private Disposable disposable;
 }

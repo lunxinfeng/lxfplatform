@@ -196,6 +196,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                 throw new RuntimeException("必须是微信或者支付宝");
         }
     }
+
     protected String qr_save() {
         switch (getType()) {
             case TYPE_ALI:
@@ -247,7 +248,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
 //            debug(TAG, "save: id = " + id);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.w(TAG,"解析图片出错");
+            Log.w(TAG, "解析图片出错");
             User user = new User();
             user.account = SPHelper.getInstance().getString(AliPayUI.acc);
             user.offset = getOffsetV();
@@ -318,17 +319,18 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
 
     }
 
-    protected void input(){
+    protected void input() {
         input(0);
     }
+
     public void input(int num) {
         num++;
-        if (num>2)
+        if (num > 2)
             return;
         AccessibilityNodeInfo root = getRootInActiveWindow();
-        if (root ==null){
+        if (root == null) {
             final int finalNum = num;
-            Single.timer(200,TimeUnit.MILLISECONDS)
+            Single.timer(200, TimeUnit.MILLISECONDS)
                     .subscribe(new Consumer<Long>() {
                         @Override
                         public void accept(Long aLong) throws Exception {
@@ -338,9 +340,9 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             return;
         }
         List<AccessibilityNodeInfo> etContent = root.findAccessibilityNodeInfosByViewId(amount_et());
-        if (etContent == null || etContent.size() == 0){
+        if (etContent == null || etContent.size() == 0) {
             final int finalNum1 = num;
-            Single.timer(200,TimeUnit.MILLISECONDS)
+            Single.timer(200, TimeUnit.MILLISECONDS)
                     .subscribe(new Consumer<Long>() {
                         @Override
                         public void accept(Long aLong) throws Exception {
@@ -354,66 +356,23 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         performEditText(nodeInfo, getAmount() + "");
     }
 
-    protected void click(String view){
-        click(view,0);
-    }
-    protected void click(final String view, int num){
-        debug(TAG, "onAccessibilityEvent: event: " + view + "===" + num);
-        num++;
-        if (num>2)
-            return;
+    protected void click(String view) {
+        debug(TAG, "onAccessibilityEvent: event: " + view + "===");
         AccessibilityNodeInfo root = getRootInActiveWindow();
-        if (root == null){
-//            final int finalNum = num;
-//            Single.timer(500,TimeUnit.MILLISECONDS)
-//                    .subscribe(new Consumer<Long>() {
-//                        @Override
-//                        public void accept(Long aLong) throws Exception {
-//                            click(view, finalNum);
-//                        }
-//                    });
+        if (root == null) {
             return;
         }
         List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByViewId(view);
         if (node == null || node.size() == 0) {
-//            final int finalNum = num;
-//            Single.timer(500,TimeUnit.MILLISECONDS)
-//                    .subscribe(new Consumer<Long>() {
-//                        @Override
-//                        public void accept(Long aLong) throws Exception {
-//                            click(view, finalNum);
-//                        }
-//                    });
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && getType() == TYPE_WeChat) {
             click(node.get(0));
-        }else{
+        } else {
             node.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
         }
     }
 
-
-//    public void reset() throws InterruptedException {
-//        AccessibilityNodeInfo root = getRootInActiveWindow();
-//        if (root == null) {
-//            return;
-//        }
-//        List<AccessibilityNodeInfo> clear = root.findAccessibilityNodeInfosByText("清除金额");
-//        if (clear == null || clear.size() == 0) {
-//            return;
-//        }
-//        clear.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//        Thread.sleep(100);
-//
-//        List<AccessibilityNodeInfo> set = root.findAccessibilityNodeInfosByText("设置金额");
-//        if (set == null || set.size() == 0) {
-//            return;
-//        }
-//        set.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//
-//        AliPayUI.steep = 1;
-//    }
 
     public void performEditText(AccessibilityNodeInfo nodeInfo, String text) {
         if (nodeInfo != null) {
@@ -434,7 +393,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         debug(TAG, "onInterrupt");
     }
 
-    protected boolean isFinish(){
+    protected boolean isFinish() {
         int posV = getPosV();
         int endV = getEndV();
 
@@ -449,74 +408,50 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         return false;
     }
 
-//    protected void next(){
-//        try {
-//            lock.lock();
-//            AccessibilityNodeInfo root = getRootInActiveWindow();
-//            final List<AccessibilityNodeInfo> clear = root.findAccessibilityNodeInfosByViewId(qr_set());//清除金额
-//            final List<AccessibilityNodeInfo> save = root.findAccessibilityNodeInfosByViewId(qr_save());//保存图片
-//            final List<AccessibilityNodeInfo> set = root.findAccessibilityNodeInfosByViewId(qr_set());//设置金额
-//            if (clear != null && clear.size() != 0 && clear.get(0).getText().toString().equals("清除金额")) {
-//                Observable.just(1)
-//                        .subscribeOn(Schedulers.io())
-//                        .doOnNext(new Consumer<Integer>() {
-//                            @Override
-//                            public void accept(Integer integer) throws Exception {
-//                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && getType() == TYPE_WeChat) {
-//                                    click(save.get(0));
-//                                } else {
-//                                    save.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//                                }
-//                            }
-//                        })
-//                        .delay(200, TimeUnit.MILLISECONDS)
-//                        .doOnNext(new Consumer<Integer>() {
-//                            @Override
-//                            public void accept(Integer integer) throws Exception {
-//                                save();
-//                            }
-//                        })
-//                        .subscribe(new Observer<Integer>() {
-//                            Disposable d;
-//
-//                            @Override
-//                            public void onSubscribe(Disposable d) {
-//                                this.d = d;
-//                            }
-//
-//                            @Override
-//                            public void onNext(Integer integer) {
-//                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && getType() == TYPE_WeChat) {
-//                                    click(clear.get(0));
-//                                } else {
-//                                    clear.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//                                e.printStackTrace();
-//                                d.dispose();
-//                            }
-//
-//                            @Override
-//                            public void onComplete() {
-//                                d.dispose();
-//                            }
-//                        });
-//            } else if (set != null && set.size() != 0) {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && getType() == TYPE_WeChat) {
-//                    click(set.get(0));
-//                } else {
-//                    set.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//                }
-//            }
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }finally {
-//            lock.unlock();
-//        }
-//    }
+    protected void checkEffective() {
+        Observable
+                .create(new ObservableOnSubscribe<List<User>>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<List<User>> emitter) throws Exception {
+                        List<User> users = DB.queryQrNull(BaseAccessibilityService.this, getType());
+                        if (users != null)
+                            emitter.onNext(users);
+                        emitter.onComplete();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .flatMap(new Function<List<User>, ObservableSource<User>>() {
+                    @Override
+                    public ObservableSource<User> apply(List<User> users) throws Exception {
+                        return null;
+                    }
+                })
+                .subscribe(new Observer<User>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(User user) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        List<User> users = DB.queryQrNull(BaseAccessibilityService.this, getType());
+                        if (users == null)
+                            stop();
+                        else
+                            checkEffective();
+                    }
+                });
+    }
 
     protected void stop() {
         Observable
@@ -530,7 +465,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .delay(2000,TimeUnit.MILLISECONDS)
+                .delay(2000, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Integer>() {
                     Disposable d;
@@ -608,7 +543,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         Point position = new Point(rect.centerX(), rect.centerY());
         GestureDescription.Builder builder = new GestureDescription.Builder();
         Path p = new Path();
-        p.moveTo(position.x, position.y + 200);
+        p.moveTo(position.x, position.y);
         builder.addStroke(new GestureDescription.StrokeDescription(p, 0L, 100L));
         GestureDescription gesture = builder.build();
         dispatchGesture(gesture, gestureResultCallback, null);

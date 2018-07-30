@@ -20,6 +20,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_init.*
 import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class InitActivity : BaseActivity() {
@@ -35,6 +36,46 @@ class InitActivity : BaseActivity() {
 
         btnAli.setOnClickListener { startAli() }
         btnWeChat.setOnClickListener { startWeChat() }
+        btnClearAli.setOnClickListener { clearSqlLocal(BaseAccessibilityService.TYPE_ALI) }
+        btnClearWechat.setOnClickListener { clearSqlLocal(BaseAccessibilityService.TYPE_WeChat) }
+    }
+
+    private fun clearSqlLocal(type: Int) {
+        Observable
+                .create<Int> { emitter ->
+                    val datas = DB.queryAll(this, type)
+                    if (datas != null) {
+                        val result = DB.deleteAll(this, *datas.toTypedArray())
+                        emitter.onNext(result)
+                    }
+                    emitter.onComplete()
+                }
+                .subscribeOn(Schedulers.io())
+                .subscribe(object :Observer<Int>{
+                    var d: Disposable? = null
+                    override fun onComplete() {
+                        getDataFromSql()
+                        d?.dispose()
+                    }
+
+                    override fun onSubscribe(d: Disposable) {
+                        this.d = d
+                    }
+
+                    override fun onNext(t: Int) {
+                    }
+
+                    override fun onError(e: Throwable) {
+                        e.printStackTrace()
+                        d?.dispose()
+                    }
+
+                })
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        startType = intent.getIntExtra("reStart", 0)
     }
 
     override fun onResume() {
@@ -50,8 +91,24 @@ class InitActivity : BaseActivity() {
                     val wechat_last = DB.queryLast(this, BaseAccessibilityService.TYPE_WeChat)
                     if (ali_last != null)
                         emitter.onNext(ali_last)
+                    else
+                        emitter.onNext(User().apply {
+                            type = BaseAccessibilityService.TYPE_ALI
+                            account = ""
+                            pos_curr = 1
+                            pos_end = 300000
+                            offset = 0
+                        })
                     if (wechat_last != null)
                         emitter.onNext(wechat_last)
+                    else
+                        emitter.onNext(User().apply {
+                            type = BaseAccessibilityService.TYPE_WeChat
+                            account = ""
+                            pos_curr = 1
+                            pos_end = 300000
+                            offset = 0
+                        })
 
                     emitter.onComplete()
                 }
@@ -74,10 +131,10 @@ class InitActivity : BaseActivity() {
 
                     }
                 }
-                .delay(2000,TimeUnit.MILLISECONDS)
+                .delay(2000, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete {
-                    debug(localClassName,"startType:$startType")
+                    debug(localClassName, "startType:$startType")
                     when (startType) {
                         1 -> {
                             btnAli.performClick()
@@ -176,7 +233,7 @@ class InitActivity : BaseActivity() {
         SPHelper.getInstance().putInt(WechatUI.offsetV, offset)
         SPHelper.getInstance().putInt(WechatUI.beishuV, beishu)
 
-        WechatUI.steep = 0
+        WechatUI.steep = -2
 
         val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/"
         val file = File(filePath)
