@@ -63,6 +63,9 @@ import io.reactivex.schedulers.Schedulers;
 import static com.fintech.lxf.helper.ExpansionKt.debug;
 
 public abstract class BaseAccessibilityService extends AccessibilityService {
+    public static int startPos = 1;
+    public static int endPos = 3000;
+    public static int offsetTotal = 5;
     public static final int TYPE_ALI = 1;
     public static final int TYPE_WeChat = 2;
     protected String currClass;
@@ -289,7 +292,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
     }
 
     public void resetPos() {
-        putPosV(1);
+        putPosV(startPos);
         offsetAddAdd();
     }
 
@@ -408,8 +411,8 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         int posV = getPosV();
         int endV = getEndV();
 
-        if (posV * getbeishu() > endV) {
-            if (getOffsetV() >= 4) {
+        if (posV > endV) {
+            if (getOffsetV() >= offsetTotal - 1) {
                 stop();
                 return true;
             } else {
@@ -469,9 +472,9 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                 .create(new ObservableOnSubscribe<List<User>>() {
                     @Override
                     public void subscribe(ObservableEmitter<List<User>> emitter) throws Exception {
+                        SystemClock.sleep(3000);
                         Intent intent = new Intent(BaseAccessibilityService.this, InitActivity.class);
                         BaseAccessibilityService.this.startActivity(intent);
-                        SystemClock.sleep(3000);
                         List<User> users = DB.queryAll(BaseAccessibilityService.this, getType());
                         if (users != null)
                             emitter.onNext(users);

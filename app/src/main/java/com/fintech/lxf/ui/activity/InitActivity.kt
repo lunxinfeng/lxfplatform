@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.text.Editable
+import android.text.TextWatcher
 import com.fintech.lxf.R
 import com.fintech.lxf.base.BaseActivity
 import com.fintech.lxf.db.DB
@@ -34,6 +36,43 @@ class InitActivity : BaseActivity() {
 
         SPHelper.getInstance().init(this)
 
+        et_ali_startPos.addTextChangedListener(object :TextWatcher{
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                BaseAccessibilityService.startPos = s?.toString()?.toIntOrNull()?:1
+            }
+
+        })
+
+        et_ali_total.addTextChangedListener(object :TextWatcher{
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                BaseAccessibilityService.endPos = s?.toString()?.toIntOrNull()?:3000
+            }
+
+        })
+        et_ali_offsetTotal.addTextChangedListener(object :TextWatcher{
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                BaseAccessibilityService.offsetTotal = s?.toString()?.toIntOrNull()?:5
+            }
+
+        })
         btnAli.setOnClickListener { startAli() }
         btnWeChat.setOnClickListener { startWeChat() }
         btnClearAli.setOnClickListener { clearSqlLocal(BaseAccessibilityService.TYPE_ALI) }
@@ -91,24 +130,24 @@ class InitActivity : BaseActivity() {
                     val wechat_last = DB.queryLast(this, BaseAccessibilityService.TYPE_WeChat)
                     if (ali_last != null)
                         emitter.onNext(ali_last)
-                    else
-                        emitter.onNext(User().apply {
-                            type = BaseAccessibilityService.TYPE_ALI
-                            account = ""
-                            pos_curr = 1
-                            pos_end = 300000
-                            offset = 0
-                        })
+//                    else
+//                        emitter.onNext(User().apply {
+//                            type = BaseAccessibilityService.TYPE_ALI
+//                            account = ""
+//                            pos_curr = 1
+//                            pos_end = 300000
+//                            offset = 0
+//                        })
                     if (wechat_last != null)
                         emitter.onNext(wechat_last)
-                    else
-                        emitter.onNext(User().apply {
-                            type = BaseAccessibilityService.TYPE_WeChat
-                            account = ""
-                            pos_curr = 1
-                            pos_end = 300000
-                            offset = 0
-                        })
+//                    else
+//                        emitter.onNext(User().apply {
+//                            type = BaseAccessibilityService.TYPE_WeChat
+//                            account = ""
+//                            pos_curr = 1
+//                            pos_end = 300000
+//                            offset = 0
+//                        })
 
                     emitter.onComplete()
                 }
@@ -182,10 +221,10 @@ class InitActivity : BaseActivity() {
             return
         }
         val acc = et_ali_account.text.toString().trim()
-        val pos = et_ali_pos.text.toString().trim().toIntOrNull() ?: 1
+        val pos = et_ali_pos.text.toString().trim().toIntOrNull() ?: BaseAccessibilityService.startPos
         val offset = et_ali_offset.text.toString().trim().toIntOrNull() ?: 0
         val beishu = 100
-        val end = et_ali_total.text.toString().trim().toIntOrNull() ?: 300000
+        val end = et_ali_total.text.toString().trim().toIntOrNull() ?: BaseAccessibilityService.endPos
 
         SPHelper.getInstance().putString(AliPayUI.acc, acc)
         SPHelper.getInstance().putInt(AliPayUI.posV, pos)
@@ -224,7 +263,7 @@ class InitActivity : BaseActivity() {
         val pos = et_wx_pos.text.toString().trim().toIntOrNull() ?: 1
         val offset = et_wx_offset.text.toString().trim().toIntOrNull() ?: 0
         val beishu = 100
-        val end = et_wx_total.text.toString().trim().toIntOrNull() ?: 300000
+        val end = et_wx_total.text.toString().trim().toIntOrNull() ?: 3000
 
         SPHelper.getInstance().putString(WechatUI.acc, acc)
         SPHelper.getInstance().putInt(WechatUI.posV, pos)

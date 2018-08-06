@@ -49,6 +49,7 @@ import static com.fintech.lxf.helper.ExpansionKt.debug;
 public class AlipayAccessibilityService extends BaseAccessibilityService {
     private int lastType;
     private int lastSteep;
+
     @Override
     protected int getType() {
         return TYPE_ALI;
@@ -56,13 +57,13 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        if (!isNonNormal(event)){
+        if (!isNonNormal(event)) {
             parserEvent(event);
             lastType = event.getEventType();
         }
     }
 
-    private boolean isNonNormal(AccessibilityEvent event){//会打开两次设置金额页面
+    private boolean isNonNormal(AccessibilityEvent event) {//会打开两次设置金额页面
         return lastType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && lastSteep == 5
                 && event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
                 && event.getClassName().toString().equals("com.alipay.mobile.payee.ui.PayeeQRActivity");
@@ -93,7 +94,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                             lastSteep = steep;
                             click(amount_btnSure());
                         }
-                        if (steep == 1 || steep == 2) {
+                        if (steep == 0 ||steep == 1 || steep == 2) {
                             lastSteep = steep;
                             steep = 2;
 //                            clearLocalPic();
@@ -103,7 +104,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                         break;
                     case "com.alipay.mobile.framework.app.ui.DialogHelper$APGenericProgressDialog":
                         debug(TAG, "onAccessibilityEvent: 设置金额加载框: " + steep);
-                        if (steep == 2){
+                        if (steep == 2) {
                             lastSteep = steep;
                             steep = 3;
                         }
@@ -119,19 +120,38 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                             steep = 4;
 
                             AccessibilityNodeInfo root = getRootInActiveWindow();
-                            if (root != null){
+                            if (root != null) {
                                 List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("清除金额");
-                                if (node != null && node.size() > 0){
+                                if (node != null && node.size() > 0) {
 
 
                                     clearLocalPic();
                                     File file = getPicFile();
                                     File[] files = file.listFiles();
-                                    debug(TAG, "本地图片数量：" + (files == null ? 0:files.length));
+                                    debug(TAG, "本地图片数量：" + (files == null ? 0 : files.length));
                                     click(qr_save());
+                                }
+
+                                if (steep == 0) {
+                                    List<AccessibilityNodeInfo> node_2 = root.findAccessibilityNodeInfosByText("设置金额");
+                                    if (node_2 != null && node_2.size() > 0) {
+                                        node_2.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                        debug(TAG, "click-------->设置金额");
+                                    }
                                 }
                             }
                         }
+                        break;
+                    case "com.alipay.mobile.commonui.widget.APNoticePopDialog"://人气大爆发
+                        AccessibilityNodeInfo root = getRootInActiveWindow();
+                        if (root == null) {
+                            return;
+                        }
+                        List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByViewId(AliPayUI.btn_ensure);
+                        if (node == null || node.size() == 0) {
+                            return;
+                        }
+                        node.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
                         break;
                 }
                 break;
@@ -144,9 +164,9 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                     AccessibilityNodeInfo root = getRootInActiveWindow();
                     if (root == null) return;
                     List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("设置金额");
-                    if (node != null && node.size() > 0){
+                    if (node != null && node.size() > 0) {
                         node.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                        debug(TAG,"click-------->设置金额");
+                        debug(TAG, "click-------->设置金额");
                     }
                 }
                 break;
@@ -154,7 +174,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                 debug(TAG, "onAccessibilityEvent: 通知改变: " + steep);
                 if (event.getClassName().toString().contains("Toast") &&
                         event.getText().get(0).toString().contains("网络")) {//设置金额点击确定时，网络出错
-                    if (steep == 3 || steep == 2){
+                    if (steep == 3 || steep == 2) {
                         lastSteep = steep;
                         click(amount_btnSure());
                     }
@@ -180,24 +200,37 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
 
     private void main(int reStartNum) {
         AccessibilityNodeInfo root = getRootInActiveWindow();
-        if (root == null){
+        if (root == null) {
             reStartNum++;
-            SystemClock.sleep(5000);
-            if (reStartNum<3)
+            SystemClock.sleep(3000);
+            if (reStartNum < 3)
                 main(reStartNum);
             return;
         }
-        List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("收钱");
-        if (node == null || node.size() == 0){
+        List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("首页");
+        if (node == null || node.size() == 0) {
             reStartNum++;
-            SystemClock.sleep(5000);
-            if (reStartNum<3)
+            SystemClock.sleep(3000);
+            if (reStartNum < 3)
+                main(reStartNum);
+            return;
+        }
+        node.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        debug(TAG, "click-------->首页");
+        SystemClock.sleep(1500);
+
+        List<AccessibilityNodeInfo> node2 = root.findAccessibilityNodeInfosByText("收钱");
+        if (node2 == null || node2.size() == 0) {
+            reStartNum++;
+            SystemClock.sleep(3000);
+            if (reStartNum < 3)
                 main(reStartNum);
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            node.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
-            debug(TAG,"click-------->收钱");
+
+            node2.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            debug(TAG, "click-------->收钱");
         }
     }
 

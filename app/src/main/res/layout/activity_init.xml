@@ -22,13 +22,14 @@
         android:id="@+id/et_ali_pos"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:ems="10"
-        android:hint="@string/pos_hint"
+        android:enabled="false"
+        android:hint="@string/pos_curr"
         android:inputType="number"
         android:text=""
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/et_ali_startPos"
         app:layout_constraintTop_toBottomOf="@+id/et_ali_account" />
 
     <EditText
@@ -48,12 +49,14 @@
         android:id="@+id/et_ali_offset"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:ems="10"
-        android:hint="@string/offset_hint"
+        android:enabled="false"
+        android:hint="@string/offset_curr"
         android:inputType="number"
         android:text=""
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/et_ali_offsetTotal"
         app:layout_constraintTop_toBottomOf="@+id/et_ali_total" />
 
 
@@ -142,5 +145,29 @@
         android:text="清空本地微信数据"
         app:layout_constraintBottom_toTopOf="@+id/et_wx_account"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <EditText
+        android:id="@+id/et_ali_startPos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:ems="10"
+        android:hint="@string/pos_hint"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toBottomOf="@+id/et_ali_pos"
+        app:layout_constraintEnd_toStartOf="@+id/et_ali_pos"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/et_ali_offsetTotal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:ems="10"
+        android:hint="@string/offset_hint"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toBottomOf="@+id/et_ali_offset"
+        app:layout_constraintEnd_toStartOf="@+id/et_ali_offset"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
