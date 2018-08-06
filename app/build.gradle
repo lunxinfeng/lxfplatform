@@ -7,7 +7,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.fintech.match.pay"
+        applicationId "com.fintech.match.pay_2"
         minSdkVersion 24
         targetSdkVersion 27
         versionCode 1
@@ -40,4 +40,5 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.0'
     implementation files('libs/jpqrcode.jar')
     implementation 'pub.devrel:easypermissions:1.2.0'
+    implementation 'com.opencsv:opencsv:4.1'
 }

@@ -17,6 +17,8 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
@@ -29,8 +31,13 @@ import com.fintech.lxf.helper.AliPayUI;
 import com.fintech.lxf.helper.QrCodeParser;
 import com.fintech.lxf.helper.SPHelper;
 import com.fintech.lxf.helper.WechatUI;
+import com.fintech.lxf.ui.activity.InitActivity;
+import com.opencsv.CSVWriter;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -45,7 +53,9 @@ import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -58,6 +68,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
     protected String currClass;
     private Lock lock = new ReentrantLock();
     protected LinkedList<User> users = new LinkedList<>();
+    protected CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public static final String TAG = BaseAccessibilityService.class.getSimpleName();
 
@@ -455,51 +466,34 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
 
     protected void stop() {
         Observable
-                .create(new ObservableOnSubscribe<Integer>() {
+                .create(new ObservableOnSubscribe<List<User>>() {
                     @Override
-                    public void subscribe(ObservableEmitter<Integer> emitter) throws Exception {
+                    public void subscribe(ObservableEmitter<List<User>> emitter) throws Exception {
+                        Intent intent = new Intent(BaseAccessibilityService.this, InitActivity.class);
+                        BaseAccessibilityService.this.startActivity(intent);
+                        SystemClock.sleep(3000);
                         List<User> users = DB.queryAll(BaseAccessibilityService.this, getType());
                         if (users != null)
-                            emitter.onNext(users.size());
+                            emitter.onNext(users);
                         emitter.onComplete();
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .delay(2000, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Integer>() {
+                .subscribe(new Observer<List<User>>() {
                     Disposable d;
 
                     @Override
                     public void onSubscribe(Disposable d) {
                         this.d = d;
+                        compositeDisposable.add(d);
                     }
 
                     @Override
-                    public void onNext(Integer integer) {
-                        Log.d(TAG, "onNext: 程序初始化完毕,共存储数据 " + integer);
-                        AlertDialog dialog = new AlertDialog.Builder(BaseAccessibilityService.this)
-                                .setMessage("程序初始化完毕,共存储数据" + integer + "条。")
-                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        try {
-                                            PackageManager packageManager = BaseAccessibilityService.this.getApplicationContext().getPackageManager();
-                                            Intent intent = packageManager.
-                                                    getLaunchIntentForPackage("com.fintech.match.pay");
-                                            BaseAccessibilityService.this.startActivity(intent);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                })
-                                .create();
-                        if (Build.VERSION.SDK_INT >= 26)
-                            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
-                        else
-                            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-
-                        dialog.show();
+                    public void onNext(final List<User> users) {
+                        saveToCSV(users);
+                        Log.d(TAG, "onNext: 程序初始化完毕,共存储数据 " + users.size());
+                        showResult(users);
                     }
 
                     @Override
@@ -510,12 +504,36 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
 
                     @Override
                     public void onComplete() {
-                        d.dispose();
+                        compositeDisposable.dispose();
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             disableSelf();
                         }
                     }
                 });
+    }
+
+    private void showResult(List<User> users) {
+        AlertDialog dialog = new AlertDialog.Builder(BaseAccessibilityService.this)
+                .setMessage("程序初始化完毕,共存储数据" + users.size() + "条。")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            Intent intent = new Intent(BaseAccessibilityService.this, InitActivity.class);
+                            BaseAccessibilityService.this.startActivity(intent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                })
+                .create();
+        if (Build.VERSION.SDK_INT >= 26){
+            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+        } else{
+            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+        }
+
+        dialog.show();
     }
 
 
@@ -555,5 +573,52 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
     public void onDestroy() {
         disableSelf();
         super.onDestroy();
+    }
+
+    private void saveToCSV(List<User> users){
+        Observable.fromIterable(users)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<User>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(User user) {
+                        saveToCSV(user);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        System.out.println("BaseAccessibilityService.onComplete");
+                    }
+                });
+//        compositeDisposable.add(d);
+    }
+
+    private void saveToCSV(User user){
+        try {
+            CSVWriter csvWriter = getCsvWriter();
+            String[] re = new String[]{
+                    SPHelper.getInstance().getString(AliPayUI.acc),
+                    user.qr_str,
+                    (user.pos_curr * user.multiple - user.offset) / 100.0 + ""};
+            debug(TAG,"csv:" + Arrays.toString(re));
+            csvWriter.writeNext(re);
+            csvWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private CSVWriter getCsvWriter() throws IOException {
+        String filePath = Environment.getExternalStorageDirectory() + "/a_match_pay/ali-" + SPHelper.getInstance().getString(AliPayUI.acc) + "-" + getOffsetV() + "-all" + ".txt";
+        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(filePath, true), "GBK");
+        return new CSVWriter(writer);
     }
 }

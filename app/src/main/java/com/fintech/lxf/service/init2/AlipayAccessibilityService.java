@@ -14,6 +14,7 @@ import com.fintech.lxf.db.DB;
 import com.fintech.lxf.db.User;
 import com.fintech.lxf.helper.AliPayUI;
 import com.fintech.lxf.ui.activity.InitActivity;
+import com.opencsv.CSVWriter;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
@@ -83,14 +84,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                             lastSteep = steep;
                             steep = 1;
 
-                            AccessibilityNodeInfo root = getRootInActiveWindow();
-                            if (root == null) return;
-                            List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("收钱");
-                            if (node == null || node.size() == 0) return;
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                node.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                debug(TAG,"click-------->收钱");
-                            }
+                            main(0);
                         }
                         break;
                     case "com.alipay.mobile.payee.ui.PayeeQRSetMoneyActivity":
@@ -133,7 +127,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                                     clearLocalPic();
                                     File file = getPicFile();
                                     File[] files = file.listFiles();
-                                    debug(TAG, "本地图片数量：" + files.length);
+                                    debug(TAG, "本地图片数量：" + (files == null ? 0:files.length));
                                     click(qr_save());
                                 }
                             }
@@ -184,10 +178,34 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
         debug(TAG, "onAccessibilityEvent: --------------------------------------------------------------------- ");
     }
 
+    private void main(int reStartNum) {
+        AccessibilityNodeInfo root = getRootInActiveWindow();
+        if (root == null){
+            reStartNum++;
+            SystemClock.sleep(5000);
+            if (reStartNum<3)
+                main(reStartNum);
+            return;
+        }
+        List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("收钱");
+        if (node == null || node.size() == 0){
+            reStartNum++;
+            SystemClock.sleep(5000);
+            if (reStartNum<3)
+                main(reStartNum);
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            node.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            debug(TAG,"click-------->收钱");
+        }
+    }
+
 
     @Override
     public void onCreate() {
         super.onCreate();
+        lastReStart = System.currentTimeMillis();
         db();
     }
 
@@ -224,6 +242,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                     @Override
                     public void onSubscribe(Disposable d) {
                         this.d = d;
+                        compositeDisposable.add(d);
                     }
 
                     @Override
@@ -238,8 +257,8 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                             if (last != null) {
                                 long lastTime = last.saveTime;
                                 if (currTime - Math.max(lastTime, lastReStart) > 30 * 1000) {
-                                    if (++reStartNum > 5) {
-                                        debug(TAG, "已连续重启5次，不能正常运行，请手动重启。");
+                                    if (++reStartNum > 3) {
+                                        debug(TAG, "已连续重启3次，不能正常运行，请手动重启。");
                                         disableSelf();
                                         onComplete();
                                         return;
