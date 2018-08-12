@@ -16,9 +16,21 @@ public abstract class AppDatabase extends RoomDatabase {
         synchronized (sLock) {
             if (INSTANCE == null) {
                 INSTANCE = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "user.db")
-                                .build();
+//                        .addMigrations(MIGRATION_1_2)
+                        .build();
             }
             return INSTANCE;
         }
     }
+
+//    private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+//        @Override
+//        public void migrate(SupportSQLiteDatabase database) {
+//            database.execSQL("ALTER TABLE User "
+//                    + " ADD COLUMN pos_start int");
+//            database.execSQL("ALTER TABLE User "
+//                    + " ADD COLUMN offset_total int");
+//        }
+//    };
+
 }

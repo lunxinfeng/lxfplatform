@@ -13,7 +13,9 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.fintech.lxf.App;
 import com.fintech.lxf.R;
+import com.fintech.lxf.net.Constants;
 
 import org.json.JSONObject;
 import java.text.SimpleDateFormat;
@@ -24,102 +26,101 @@ import java.util.UUID;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
 
-import static com.fintech.lxf.net.ConfigKt.RC_PERMISSION;
 
 public class Utils {
-//
-//    public static final String deviceInfo = android.os.Build.BRAND.concat("|").concat(android.os.Build.MODEL).concat("|").concat(android.os.Build.VERSION.RELEASE);
-//
-//    public static String getDeviceInfo() {
-//        return deviceInfo;
-//    }
-//
-//    /**
-//     * android.os.Build.BRAND
-//     * android.os.Build.MODEL
-//     * android.os.Build.VERSION.RELEASE
-//     */
-//    public static String getIMEI(Context context) {
-//        String deviceId;
-//        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-//        if (tm != null) {
-//            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-//                ToastUtils.show("请将应用的所有权限开启");
-//            } else {
-//                deviceId = tm.getDeviceId();
-//                if (!("000000000000000".equals(deviceId))) {
-//                    return deviceId;
-//                }
-//            }
-//        }
-//        SharedPreferences sp = App.getApplication().getSharedPreferences("imei", Context.MODE_PRIVATE);
-//        deviceId = sp.getString("imei", "");
-//        if (TextUtils.isEmpty(deviceId)) {
-//            deviceId = UUID.randomUUID().toString().replace("-", "");
-//            SharedPreferences.Editor edit = sp.edit();
-//            edit.putString("imei", deviceId);
-//            edit.commit();
-//        }
-//        return deviceId;
-//    }
-//
-//    /**
-//     * android.os.Build.BRAND
-//     * android.os.Build.MODEL
-//     * android.os.Build.VERSION.RELEASE
-//     */
-//    public static String getIMEI(Activity activity) {
-//        String deviceId;
-//        TelephonyManager tm = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-//        if (tm != null) {
-//            if (ActivityCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-//                goPermissionSetting(activity);
-//            }
-//            deviceId = tm.getDeviceId();
-//            if (!("000000000000000".equals(deviceId))) {
-//                return deviceId;
-//            }
-//        }
-//        SharedPreferences sp = App.getApplication().getSharedPreferences("imei", Context.MODE_PRIVATE);
-//        deviceId = sp.getString("imei", "");
-//        if (TextUtils.isEmpty(deviceId)) {
-//            deviceId = UUID.randomUUID().toString().replace("-", "");
-//            SharedPreferences.Editor edit = sp.edit();
-//            edit.putString("imei", deviceId);
-//            edit.commit();
-//        }
-//        return deviceId;
-//    }
-//
-//    public static Map<String, String> jsonObjectToMap(JSONObject jsonObject) {
-//        Map<String, String> map = new HashMap<>();
-//        Iterator<String> iterator = jsonObject.keys();
-//        while (iterator.hasNext()) {
-//            String next = iterator.next();
-//            Object opt = jsonObject.opt(next);
-//            if (opt != null) {
-//                map.put(next, String.valueOf(opt));
-//            }
-//        }
-//        return map;
-//    }
-//
-//
-//    public static boolean isServiceAlive(Context context, Class<?> serviceClass) {
-//        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-//        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-//            if (serviceClass.getName().equals(service.service.getClassName())) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//
-//    public static String formatDate(Object obj) {
-//        return simpleDateFormat.format(obj);
-//    }
+
+    public static final String deviceInfo = android.os.Build.BRAND.concat("|").concat(android.os.Build.MODEL).concat("|").concat(android.os.Build.VERSION.RELEASE);
+
+    public static String getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    /**
+     * android.os.Build.BRAND
+     * android.os.Build.MODEL
+     * android.os.Build.VERSION.RELEASE
+     */
+    public static String getIMEI(Context context) {
+        String deviceId;
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (tm != null) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(context, "请将应用的所有权限开启", Toast.LENGTH_SHORT).show();
+            } else {
+                deviceId = tm.getDeviceId();
+                if (!("000000000000000".equals(deviceId))) {
+                    return deviceId;
+                }
+            }
+        }
+        SharedPreferences sp = App.getApplication().getSharedPreferences("imei", Context.MODE_PRIVATE);
+        deviceId = sp.getString("imei", "");
+        if (TextUtils.isEmpty(deviceId)) {
+            deviceId = UUID.randomUUID().toString().replace("-", "");
+            SharedPreferences.Editor edit = sp.edit();
+            edit.putString("imei", deviceId);
+            edit.commit();
+        }
+        return deviceId;
+    }
+
+    /**
+     * android.os.Build.BRAND
+     * android.os.Build.MODEL
+     * android.os.Build.VERSION.RELEASE
+     */
+    public static String getIMEI(Activity activity) {
+        String deviceId;
+        TelephonyManager tm = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
+        if (tm != null) {
+            if (ActivityCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                goPermissionSetting(activity);
+            }
+            deviceId = tm.getDeviceId();
+            if (!("000000000000000".equals(deviceId))) {
+                return deviceId;
+            }
+        }
+        SharedPreferences sp = App.getApplication().getSharedPreferences("imei", Context.MODE_PRIVATE);
+        deviceId = sp.getString("imei", "");
+        if (TextUtils.isEmpty(deviceId)) {
+            deviceId = UUID.randomUUID().toString().replace("-", "");
+            SharedPreferences.Editor edit = sp.edit();
+            edit.putString("imei", deviceId);
+            edit.commit();
+        }
+        return deviceId;
+    }
+
+    public static Map<String, String> jsonObjectToMap(JSONObject jsonObject) {
+        Map<String, String> map = new HashMap<>();
+        Iterator<String> iterator = jsonObject.keys();
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            Object opt = jsonObject.opt(next);
+            if (opt != null) {
+                map.put(next, String.valueOf(opt));
+            }
+        }
+        return map;
+    }
+
+
+    public static boolean isServiceAlive(Context context, Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    public static String formatDate(Object obj) {
+        return simpleDateFormat.format(obj);
+    }
 
 
     public static void goPermissionSetting(Activity activity) {
@@ -128,7 +129,7 @@ public class Utils {
                 .setRationale(activity.getApplicationContext().getString(R.string.rationale_message))
                 .setPositiveButton(activity.getApplicationContext().getString(R.string.setting))
                 .setNegativeButton(activity.getApplicationContext().getString(R.string.cancel))
-                .setRequestCode(RC_PERMISSION)
+                .setRequestCode(Constants.RC_PERMISSION)
                 .build()
                 .show();
     }

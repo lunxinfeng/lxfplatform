@@ -1,24 +1,29 @@
 package com.fintech.lxf.service.init;
 
 
-import android.accessibilityservice.AccessibilityService;
-import android.accessibilityservice.GestureDescription;
-import android.graphics.Path;
-import android.graphics.Point;
-import android.graphics.Rect;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.os.SystemClock;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.fintech.lxf.helper.WechatUI;
 
+import com.fintech.lxf.db.DB;
+import com.fintech.lxf.db.User;
+import com.fintech.lxf.ui.activity.InitActivity;
+
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.fintech.lxf.helper.ExpansionKt.debug;
@@ -26,6 +31,8 @@ import static com.fintech.lxf.helper.WechatUI.steep;
 
 
 public class WechatAccessibilityService extends BaseAccessibilityService {
+    private int lastType;
+    private int lastSteep;
 
     @Override
     protected int getType() {
@@ -34,157 +41,344 @@ public class WechatAccessibilityService extends BaseAccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+//        if (!isNonNormal(event)){
+//            parserEvent(event);
+//            lastType = event.getEventType();
+//        }
+        parserEvent(event);
+    }
 
-        try {
-            final int eventType = event.getEventType();
+    private boolean isNonNormal(AccessibilityEvent event) {//会打开两次设置金额页面
+        return lastType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && lastSteep == 5
+                && event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+                && event.getClassName().toString().equals("com.alipay.mobile.payee.ui.PayeeQRActivity");
+    }
 
-            if (AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED == eventType) {//页面发生切换
-                String className = event.getClassName().toString();
-                debug(TAG, "onAccessibilityEvent: ClassName: " + className);
+    //com.tencent.mm.plugin.mall.ui.MallIndexUI  我的钱包页面
+    //com.tencent.mm.plugin.offline.ui.WalletOfflineEntranceUI 收付款页面
+    //com.tencent.mm:id/cdj   我
+    //com.tencent.mm:id/c_b   收付款
+    //com.tencent.mm:id/e18   二维码收款
+    private synchronized void parserEvent(AccessibilityEvent event) {
+        debug(TAG, "onAccessibilityEvent: event: " + event);
+        switch (event.getEventType()) {
+            case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
+                currClass = event.getClassName().toString();
 
-                int posV = getPosV();
-                int endV = getEndV();
+                if (isFinish()) return;
 
-                if (posV * getbeishu() > endV) {
-                    if (getOffsetV() >= 4){
-                        stop();
-                        return;
-                    }else{
-                        resetPos();
+                switch (currClass) {
+                    case "com.tencent.mm.ui.LauncherUI"://首页
+                        debug(TAG, "onAccessibilityEvent: 首页: " + steep);
+                        if (steep == -2) {
+                            lastSteep = steep;
+                            steep = -1;
+
+                            AccessibilityNodeInfo root = getRootInActiveWindow();
+                            if (root != null) {
+                                List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("我");
+                                if (node != null && node.size() > 0) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        node.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                        debug(TAG, "click-------->我");
+                                    }
+                                }
+                            }
+
+                            SystemClock.sleep(1000);
+
+                            root = getRootInActiveWindow();
+                            if (root != null) {
+                                List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("钱包");
+                                if (node != null && node.size() > 0) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        node.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                        debug(TAG, "click-------->钱包");
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case "com.tencent.mm.plugin.mall.ui.MallIndexUI":
+                        debug(TAG, "onAccessibilityEvent: 我的钱包: " + steep);
+                        if (steep == -1) {
+                            lastSteep = steep;
+                            steep = 0;
+                            AccessibilityNodeInfo root = getRootInActiveWindow();
+                            if (root != null) {
+                                List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("收付款");
+                                if (node != null && node.size() > 0) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        node.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                        debug(TAG, "click-------->收付款");
+                                    }
+                                }
+                            }
+                        }
+                        break;
+//                    case "com.tencent.mm.plugin.offline.ui.WalletOfflineEntranceUI"://
+                    case "com.tencent.mm.plugin.offline.ui.WalletOfflineCoinPurseUI"://
+                        debug(TAG, "onAccessibilityEvent: 收付款页面: " + steep);
+                        if (steep == 0) {
+                            lastSteep = steep;
+                            steep = 1;
+                            AccessibilityNodeInfo root = getRootInActiveWindow();
+                            if (root != null) {
+                                List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("二维码收款");
+                                if (node != null && node.size() > 0) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        node.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                        debug(TAG, "click-------->二维码收款");
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case "com.tencent.mm.plugin.collect.ui.CollectCreateQRCodeUI":
+                        debug(TAG, "onAccessibilityEvent: 设置金额页面: " + steep);
+                        if (steep == 3) {//steep == 3网络不好时可能会发生
+                            lastSteep = steep;
+                            click(amount_btnSure());
+                        }
+                        if (steep == 1 || steep == 2) {
+                            lastSteep = steep;
+                            steep = 2;
+//                            clearLocalPic();
+                            input();
+                            click(amount_btnSure());
+                        }
+                        break;
+                    case "com.tencent.mm.ui.base.p":
+                        debug(TAG, "onAccessibilityEvent: 设置金额加载框: " + steep);
+                        if (steep == 2) {
+                            lastSteep = steep;
+                            steep = 3;
+                        }
+                        break;
+                    case "com.tencent.mm.plugin.collect.ui.CollectMainUI":
+                        debug(TAG, "onAccessibilityEvent: 二维码页面: " + steep);
+                        if (steep == 1) {
+                            lastSteep = steep;
+//                            click(qr_set());
+                            AccessibilityNodeInfo root = getRootInActiveWindow();
+                            if (root != null) {
+                                List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("设置金额");
+                                if (node != null && node.size() > 0) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        click(node.get(0));
+                                        debug(TAG, "click-------->设置金额");
+                                    }
+                                }
+                            }
+                        }
+                        if (steep == 3 || steep == 2) {//保存图片
+                            lastSteep = steep;
+                            steep = 4;
+
+                            AccessibilityNodeInfo root = getRootInActiveWindow();
+                            if (root != null) {
+                                List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("清除金额");
+                                if (node != null && node.size() > 0) {
+
+
+                                    clearLocalPic();
+                                    File file = getPicFile();
+                                    File[] files = file.listFiles();
+                                    debug(TAG, "本地图片数量：" + files.length);
+                                    AccessibilityNodeInfo root1 = getRootInActiveWindow();
+                                    if (root1 != null) {
+                                        List<AccessibilityNodeInfo> node1 = root.findAccessibilityNodeInfosByText("保存收款码");
+                                        if (node1 != null && node1.size() > 0) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                                node1.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                                click(node1.get(0));
+                                                debug(TAG, "click-------->保存收款码");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (steep == -2) {
+                            lastSteep = steep;
+
+
+                            AccessibilityNodeInfo root = getRootInActiveWindow();
+                            if (root != null) {
+                                List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("清除金额");
+                                if (node != null && node.size() > 0) {
+                                    steep = 4;
+
+                                    clearLocalPic();
+                                    File file = getPicFile();
+                                    File[] files = file.listFiles();
+                                    debug(TAG, "本地图片数量：" + files.length);
+                                    AccessibilityNodeInfo root1 = getRootInActiveWindow();
+                                    if (root1 != null) {
+                                        List<AccessibilityNodeInfo> node1 = root.findAccessibilityNodeInfosByText("保存收款码");
+                                        if (node1 != null && node1.size() > 0) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                                node1.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                                click(node1.get(0));
+                                                debug(TAG, "click-------->保存收款码");
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    steep = 1;
+
+                                    AccessibilityNodeInfo root1 = getRootInActiveWindow();
+                                    if (root1 != null) {
+                                        List<AccessibilityNodeInfo> node1 = root.findAccessibilityNodeInfosByText("设置金额");
+                                        if (node1 != null && node1.size() > 0) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                                click(node1.get(0));
+                                                debug(TAG, "click-------->设置金额");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+            case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
+                debug(TAG, "onAccessibilityEvent: 内容改变: " + steep);
+                if (steep == 5) {
+                    lastSteep = steep;
+                    steep = 1;
+//                    click(qr_set());
+                    AccessibilityNodeInfo root = getRootInActiveWindow();
+                    if (root != null) {
+                        List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("设置金额");
+                        if (node != null && node.size() > 0) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                                node.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                click(node.get(0));
+                                debug(TAG, "click-------->设置金额");
+                            }
+                        }
                     }
                 }
-
-                if ("com.tencent.mm.plugin.collect.ui.CollectCreateQRCodeUI".equals(className)) {//设置金额
-                    if (steep == 3){//steep == 3网络不好时可能会发生
-                        sure();
+                break;
+            case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED:
+                debug(TAG, "onAccessibilityEvent: 通知改变: " + steep);
+                if (event.getClassName().toString().contains("Toast") &&
+                        event.getText().get(0).toString().contains("网络")) {//设置金额点击确定时，网络出错
+                    if (steep == 3 || steep == 2) {
+                        lastSteep = steep;
+                        click(amount_btnSure());
                     }
-                    if (steep == 1) {
-                        steep = 2;
-
-                        clearLocalPic();
-
-                        input();
-
-                        sure();
-                    }
-
-
-                } else if ("com.tencent.mm.ui.base.p".equals(className)) {//加载
-                    if (steep == 2) {
-                        steep = 3;
-                    }
-
-                } else if ("com.tencent.mm.plugin.collect.ui.CollectMainUI".equals(className)) {
-
-                    if (steep == 2 || steep == 3) {//保存图片
-                        steep = 1;// 去往第四步  悬空
-
-                        Thread.sleep(300);
-
-                        final AccessibilityNodeInfo root = getRootInActiveWindow();
-                        if (root == null) {
-                            return;
+                    return;
+                }
+                if (steep != 4) return;
+                if (event.getClassName().toString().contains("Toast") &&
+                        event.getText().get(0).toString().contains("微信：图片已保存")) {//保存数据库,清除图片
+                    lastSteep = steep;
+                    steep = 5;
+                    save();
+//                    click(qr_set());
+                    AccessibilityNodeInfo root = getRootInActiveWindow();
+                    if (root != null) {
+                        List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("清除金额");
+                        if (node != null && node.size() > 0) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                                node.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                click(node.get(0));
+                                debug(TAG, "click-------->清除金额");
+                            }
                         }
-                        //如果没有 找到 清除金额 的按钮 ,说明生成定额二维码未成功,中止...
-                        final List<AccessibilityNodeInfo> clear = root.findAccessibilityNodeInfosByViewId(WechatUI.btn_set);
-                        if (clear == null || clear.size() == 0) {
-                            return;
-                        }
-                        //保存图片
-                        final List<AccessibilityNodeInfo> open = root.findAccessibilityNodeInfosByViewId(WechatUI.btn_save);
-                        if (open == null || open.size() == 0) {
-                            return;
-                        }
-                        Observable.just(getPosV())
-                                .doOnNext(new Consumer<Integer>() {
-                                    @Override
-                                    public void accept(Integer integer) throws Exception {
-//                                        open.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                            click(open.get(0));
-                                        }else{
-                                            open.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                        }
-                                    }
-                                })
-                                .observeOn(Schedulers.io())
-                                .delay(1500, TimeUnit.MILLISECONDS)
-                                .doOnNext(new Consumer<Integer>() {
-                                    @Override
-                                    public void accept(Integer integer) throws Exception {
-                                        save();
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                            click(clear.get(0));
-                                        }else{
-                                            clear.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                        }
-                                    }
-                                })
-                                .delay(300, TimeUnit.MILLISECONDS)
-                                .subscribe(new Observer<Integer>() {
-                                    Disposable d;
-                                    @Override
-                                    public void onSubscribe(Disposable d) {
-                                        this.d = d;
-                                    }
-
-                                    @Override
-                                    public void onNext(Integer integer) {
-                                        List<AccessibilityNodeInfo> set = root.findAccessibilityNodeInfosByViewId(WechatUI.btn_set);
-                                        if (set == null || set.size() == 0) {
-                                            return;
-                                        }
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                            click(set.get(0));
-                                        }else{
-                                            set.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        e.printStackTrace();
-                                        d.dispose();
-                                    }
-
-                                    @Override
-                                    public void onComplete() {
-                                        //回到第一步 回到正轨
-                                        steep = 1;
-                                        d.dispose();
-                                    }
-                                });
                     }
                 }
-            }// 页面切换
-
-        } catch (Exception e) {
-            e.printStackTrace();
+                break;
         }
+        debug(TAG, "onAccessibilityEvent: --------------------------------------------------------------------- ");
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void click(final AccessibilityNodeInfo node) {
-        click(node, new AccessibilityService.GestureResultCallback() {
-            @Override
-            public void onCompleted(GestureDescription gestureDescription) {
-                super.onCompleted(gestureDescription);
-                debug(TAG, "click: " + node.getText());
-            }
-        });
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        db();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void click(AccessibilityNodeInfo node, AccessibilityService.GestureResultCallback gestureResultCallback) {
-        Rect rect = new Rect();
-        node.getBoundsInScreen(rect);
-        Point position = new Point(rect.centerX(), rect.centerY());
-        GestureDescription.Builder builder = new GestureDescription.Builder();
-        Path p = new Path();
-        p.moveTo(position.x, position.y);
-        builder.addStroke(new GestureDescription.StrokeDescription(p, 0L, 100L));
-        GestureDescription gesture = builder.build();
-        dispatchGesture(gesture, gestureResultCallback, null);
+    private long lastReStart = 0;
+    private int reStartNum = 0;
 
+    private void db() {
+        Observable.interval(1000, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        AlertDialog dialog = new AlertDialog.Builder(WechatAccessibilityService.this)
+                                .setMessage("程序出现异常，自动重启5次未解决，请手动重启。")
+                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .create();
+                        if (Build.VERSION.SDK_INT >= 26)
+                            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+                        else
+                            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+
+                        dialog.show();
+                    }
+                })
+                .observeOn(Schedulers.io())
+                .subscribe(new Observer<Long>() {
+                    Disposable d;
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        this.d = d;
+                    }
+
+                    @Override
+                    public void onNext(Long aLong) {
+                        if (users.size() > 0) {
+                            long id = DB.insert(WechatAccessibilityService.this, users.poll());
+                            debug(TAG, "=========DB========: id = " + id);
+                            reStartNum = 0;
+                        } else {
+                            long currTime = System.currentTimeMillis();
+                            User last = DB.queryLast(WechatAccessibilityService.this, TYPE_WeChat);
+                            if (last != null) {
+                                long lastTime = last.saveTime;
+                                if (currTime - Math.max(lastTime, lastReStart) > 30 * 1000) {
+                                    if (++reStartNum > 5) {
+                                        debug(TAG, "已连续重启5次，不能正常运行，请手动重启。");
+//                                        disableSelf();
+//                                        onComplete();
+                                        return;
+                                    }
+                                    lastReStart = currTime;
+                                    debug(TAG, "=========DB========: 半分钟未检测到新数据，重新启动系统");
+                                    Intent intent = new Intent(WechatAccessibilityService.this, InitActivity.class);
+                                    intent.putExtra("reStart", TYPE_WeChat);
+                                    WechatAccessibilityService.this.startActivity(intent);
+                                } else {
+                                    debug(TAG, "=========DB========: list is null");
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        d.dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        d.dispose();
+                    }
+                });
     }
 }

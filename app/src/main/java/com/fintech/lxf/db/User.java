@@ -12,6 +12,7 @@ public class User {
     public double amount;
     public String qr_str;//二维码长串
 
+    public int pos_start;//初始pos
     public int pos_curr;//当前pos
 
     @ColumnInfo
@@ -19,6 +20,7 @@ public class User {
 
     @ColumnInfo
     public int offset;//偏移
+    public int offset_total;//总并发数
 
     @ColumnInfo
     public int multiple;//倍数
@@ -37,10 +39,12 @@ public class User {
     public String toString() {
         return "User{" +
                 "account='" + account + '\'' +
+                ", pos_start=" + pos_start +
                 ", pos_curr=" + pos_curr +
                 ", pos_end=" + pos_end +
                 ", qr_str='" + qr_str + '\'' +
                 ", offset=" + offset +
+                ", offset_total=" + offset_total +
                 ", multiple=" + multiple +
                 ", type=" + type +
                 ", deviceId='" + deviceId + '\'' +

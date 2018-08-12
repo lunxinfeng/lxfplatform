@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.InitActivity"
+    tools:context=".ui.init.InitActivity"
     tools:layout_editor_absoluteY="25dp">
 
     <EditText
         android:id="@+id/et_ali_account"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="@string/account"
         android:inputType="text"
@@ -18,156 +19,190 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/et_ali_pos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:ems="10"
-        android:enabled="false"
-        android:hint="@string/pos_curr"
-        android:inputType="number"
-        android:text=""
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/et_ali_startPos"
-        app:layout_constraintTop_toBottomOf="@+id/et_ali_account" />
+    <!--<EditText-->
+        <!--android:id="@+id/et_ali_pos"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="16dp"-->
+        <!--android:ems="10"-->
+        <!--android:enabled="false"-->
+        <!--android:hint="@string/pos_curr"-->
+        <!--android:inputType="number"-->
+        <!--android:text=""-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/et_ali_startPos"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/et_ali_account" />-->
 
     <EditText
         android:id="@+id/et_ali_total"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="@string/total_hint"
         android:inputType="number"
         android:text=""
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_ali_pos" />
+        app:layout_constraintTop_toBottomOf="@+id/et_ali_startPos" />
 
 
-    <EditText
-        android:id="@+id/et_ali_offset"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:ems="10"
-        android:enabled="false"
-        android:hint="@string/offset_curr"
-        android:inputType="number"
-        android:text=""
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/et_ali_offsetTotal"
-        app:layout_constraintTop_toBottomOf="@+id/et_ali_total" />
+    <!--<EditText-->
+        <!--android:id="@+id/et_ali_offset"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="16dp"-->
+        <!--android:ems="10"-->
+        <!--android:enabled="false"-->
+        <!--android:hint="@string/offset_curr"-->
+        <!--android:inputType="number"-->
+        <!--android:text=""-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/et_ali_offsetTotal"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/et_ali_total" />-->
 
 
     <Button
         android:id="@+id/btnAli"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:text="@string/start_ali"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_ali_offset" />
+        app:layout_constraintTop_toBottomOf="@+id/et_ali_offsetTotal" />
 
-    <Button
-        android:id="@+id/btnWeChat"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="@string/start_wechat"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <!--<Button-->
+        <!--android:id="@+id/btnWeChat"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="16dp"-->
+        <!--android:text="@string/start_wechat"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
 
-    <EditText
-        android:id="@+id/et_wx_offset"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:ems="10"
-        android:hint="@string/offset_hint"
-        android:inputType="number"
-        android:text=""
-        app:layout_constraintBottom_toTopOf="@+id/btnWeChat"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <!--<EditText-->
+        <!--android:id="@+id/et_wx_offset"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:ems="10"-->
+        <!--android:hint="@string/offset_hint"-->
+        <!--android:inputType="number"-->
+        <!--android:text=""-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/btnWeChat"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
 
-    <EditText
-        android:id="@+id/et_wx_total"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/total_hint"
-        android:inputType="number"
-        android:text=""
-        app:layout_constraintBottom_toTopOf="@+id/et_wx_offset"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <!--<EditText-->
+        <!--android:id="@+id/et_wx_total"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:ems="10"-->
+        <!--android:hint="@string/total_hint"-->
+        <!--android:inputType="number"-->
+        <!--android:text=""-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/et_wx_offset"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
 
-    <EditText
-        android:id="@+id/et_wx_pos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/pos_hint"
-        android:inputType="number"
-        android:text=""
-        app:layout_constraintBottom_toTopOf="@+id/et_wx_total"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <!--<EditText-->
+        <!--android:id="@+id/et_wx_pos"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:ems="10"-->
+        <!--android:hint="@string/pos_hint"-->
+        <!--android:inputType="number"-->
+        <!--android:text=""-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/et_wx_total"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
 
-    <EditText
-        android:id="@+id/et_wx_account"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/account"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/et_wx_pos"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <!--<EditText-->
+        <!--android:id="@+id/et_wx_account"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:ems="10"-->
+        <!--android:hint="@string/account"-->
+        <!--android:inputType="textPersonName"-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/et_wx_pos"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
 
-    <Button
-        android:id="@+id/btnClearAli"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="清空本地支付宝数据"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnAli" />
+    <!--<Button-->
+        <!--android:id="@+id/btnClearAli"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="16dp"-->
+        <!--android:text="清空本地支付宝数据"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/btnAli" />-->
 
-    <Button
-        android:id="@+id/btnClearWechat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="清空本地微信数据"
-        app:layout_constraintBottom_toTopOf="@+id/et_wx_account"
-        app:layout_constraintEnd_toEndOf="parent" />
+    <!--<Button-->
+        <!--android:id="@+id/btnClearWechat"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="16dp"-->
+        <!--android:text="清空本地微信数据"-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/et_wx_account"-->
+        <!--app:layout_constraintEnd_toEndOf="parent" />-->
 
     <EditText
         android:id="@+id/et_ali_startPos"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="@string/pos_hint"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="@+id/et_ali_pos"
-        app:layout_constraintEnd_toStartOf="@+id/et_ali_pos"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_ali_account" />
 
     <EditText
         android:id="@+id/et_ali_offsetTotal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="@string/offset_hint"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="@+id/et_ali_offset"
-        app:layout_constraintEnd_toStartOf="@+id/et_ali_offset"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_ali_total" />
+
+    <Button
+        android:id="@+id/btnUpload"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="60dp"
+        android:text="@string/upload"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/btnAli"
+        app:layout_constraintStart_toStartOf="@+id/btnAli" />
+
+    <Button
+        android:id="@+id/btnCSV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="@string/csv"
+        app:layout_constraintBottom_toTopOf="@+id/btnUpload"
+        app:layout_constraintEnd_toEndOf="@+id/btnAli"
+        app:layout_constraintStart_toStartOf="@+id/btnAli" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/wechat_init"
+        android:textColor="@android:color/holo_blue_light"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

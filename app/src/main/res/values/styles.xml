@@ -1,11 +1,31 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowIsFloating">true</item>
+        <!-- 设置未浮动窗口 -->
+        <item name="android:windowFrame">@null</item>
+        <!-- 设置无边框 -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- 设置无标题 -->
+        <item name="android:windowBackground">@color/transparent</item>
+        <!-- 设置完全透明 -->
+        <item name="android:backgroundDimEnabled">true</item>
+        <!-- 设置屏幕变暗 -->
+    </style>
+
+    <style name="button_primary_dark">
+        <item name="android:background">@drawable/btn_background_primary_dark</item>
+        <item name="android:textColor">@drawable/btn_text_primary_dark</item>
+        <item name="elevation">5dp</item>
+    </style>
+
+    <color name="transparent">#00ffffff</color>
 </resources>

@@ -41,4 +41,6 @@ dependencies {
     implementation files('libs/jpqrcode.jar')
     implementation 'pub.devrel:easypermissions:1.2.0'
     implementation 'com.opencsv:opencsv:4.1'
+    implementation 'com.github.franmontiel:PersistentCookieJar:v1.0.1'
+    implementation files('libs/alipaySdk-20180601.jar')
 }

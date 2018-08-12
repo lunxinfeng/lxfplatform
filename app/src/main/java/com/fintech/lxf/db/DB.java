@@ -1,6 +1,5 @@
 package com.fintech.lxf.db;
 
-
 import android.content.Context;
 
 import java.util.List;
@@ -20,6 +19,9 @@ public class DB {
 
     public static int deleteAll(Context context, User... users){
         return AppDatabase.getInstance(context).userDao().delAll(users);
+    }
+    public static void deleteTable(Context context){
+        AppDatabase.getInstance(context).userDao().delTable();
     }
 
     public static List<User> queryQrNull(Context context, int type){
