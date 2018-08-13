@@ -13,7 +13,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.fintech.lxf.db.DB;
 import com.fintech.lxf.db.User;
-import com.fintech.lxf.ui.activity.InitActivity;
+import com.fintech.lxf.ui.activity.init.InitActivity;
 
 import java.io.File;
 import java.util.List;

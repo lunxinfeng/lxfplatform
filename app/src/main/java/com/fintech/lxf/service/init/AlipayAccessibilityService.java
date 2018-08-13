@@ -10,7 +10,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import com.fintech.lxf.db.DB;
 import com.fintech.lxf.db.User;
 import com.fintech.lxf.helper.AliPayUI;
-import com.fintech.lxf.ui.activity.InitActivity;
+import com.fintech.lxf.ui.activity.init.InitActivity;
+import com.fintech.lxf.ui.activity.init.InitModel;
 
 import java.io.File;
 import java.util.List;
@@ -287,13 +288,13 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                                     }
                                     debug(TAG, "已连续重启" + reStartNum + "次，不能正常运行，杀死应用后重启。");
                                     Intent intent = new Intent(AlipayAccessibilityService.this, InitActivity.class);
-                                    intent.putExtra("reStart", 2000);
+                                    intent.putExtra("reStart", InitModel.Companion.getSTRAT_TYPE_KILL_BACKGROUND());
                                     AlipayAccessibilityService.this.startActivity(intent);
                                     return;
                                 }
                                 debug(TAG, "=========DB========: 半分钟未检测到新数据，重新启动系统");
                                 Intent intent = new Intent(AlipayAccessibilityService.this, InitActivity.class);
-                                intent.putExtra("reStart", TYPE_ALI);
+                                intent.putExtra("reStart", InitModel.Companion.getSTRAT_TYPE_ERROR_NORMAL());
                                 AlipayAccessibilityService.this.startActivity(intent);
                             } else {
 //                                    if (isFinish) return;

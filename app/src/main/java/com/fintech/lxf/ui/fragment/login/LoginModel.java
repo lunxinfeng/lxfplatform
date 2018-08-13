@@ -1,4 +1,4 @@
-package com.fintech.lxf.ui.activity.login;
+package com.fintech.lxf.ui.fragment.login;
 
 
 import android.content.Context;
@@ -15,9 +15,9 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.fintech.lxf.net.Constants.*;
 
-public class LoginUtil {
+public class LoginModel {
 
-    public static void delLocalData(final Context context) {
+    public void delLocalData(final Context context) {
         Single.just(1)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Consumer<Integer>() {
@@ -33,7 +33,7 @@ public class LoginUtil {
     }
 
 
-    public static void saveData(Map<String, String> result) {
+    public void saveData(Map<String, String> result) {
         Configuration.putUserInfo(KEY_USER_NAME, result.get(KEY_USER_NAME));
         Configuration.putUserInfo(KEY_MCH_ID, result.get(KEY_MCH_ID));
         Configuration.putUserInfo(KEY_LOGIN_TOKEN, result.get(KEY_LOGIN_TOKEN));

@@ -9,6 +9,7 @@ import com.fintech.lxf.R
 import com.fintech.lxf.base.BaseActivity
 import com.fintech.lxf.helper.RegexUtil
 import com.fintech.lxf.helper.Utils
+import com.fintech.lxf.helper.onChange
 import com.fintech.lxf.helper.toast
 import com.fintech.lxf.net.Constants
 import com.fintech.lxf.ui.activity.login.LoginActivity
@@ -38,20 +39,10 @@ class ConfigActivity : BaseActivity(),ConfigContract.View, EasyPermissions.Permi
 
         setSupportActionBar(toolbar)
 
-        etAddress.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                Constants.baseUrl = s.toString()
-                btnNext.isEnabled = RegexUtil.isMatch(RegexUtil.URL,Constants.baseUrl)
-            }
-
-        })
+        etAddress.onChange {
+            Constants.baseUrl = it.toString()
+            btnNext.isEnabled = RegexUtil.isMatch(RegexUtil.URL,Constants.baseUrl)
+        }
         btnNext.setOnClickListener { presenter.check(Constants.baseUrl) }
     }
 

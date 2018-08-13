@@ -3,6 +3,7 @@
     package="com.fintech.lxf">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -19,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.activity.InitActivity"
+            android:name=".ui.activity.init.InitActivity"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -67,7 +68,7 @@
         </service>
 
         <activity android:name=".ui.activity.config.ConfigActivity" />
-        <activity android:name=".ui.activity.login.LoginActivity"></activity>
+        <activity android:name=".ui.activity.login.LoginActivity" />
     </application>
 
 </manifest>

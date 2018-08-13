@@ -27,7 +27,7 @@ import com.fintech.lxf.helper.AliPayUI;
 import com.fintech.lxf.helper.QrCodeParser;
 import com.fintech.lxf.helper.SPHelper;
 import com.fintech.lxf.helper.WechatUI;
-import com.fintech.lxf.ui.activity.InitActivity;
+import com.fintech.lxf.ui.activity.init.InitActivity;
 import com.opencsv.CSVWriter;
 
 import java.io.File;

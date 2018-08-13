@@ -1,11 +1,10 @@
-package com.fintech.lxf.ui.activity.login
+package com.fintech.lxf.ui.fragment.login.ali
 
 import android.app.Activity
-import android.content.Context
 import cn.izis.yztv.base.BaseView
 import com.fintech.lxf.base.BasePresenter
 
-interface LoginContract {
+interface LoginAliContract {
     interface View: BaseView {
         val context: Activity
 
@@ -14,7 +13,6 @@ interface LoginContract {
     }
 
     interface Presenter: BasePresenter {
-        fun accountLogin()
         fun aliLogin()
     }
 }

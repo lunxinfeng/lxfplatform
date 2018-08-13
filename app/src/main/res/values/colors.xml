@@ -6,4 +6,5 @@
     <color name="btn_unenable">#9f9d9e</color>
     <color name="black_90">#90000000</color>
     <color name="white">#ffffff</color>
+    <color name="transparent">#00ffffff</color>
 </resources>

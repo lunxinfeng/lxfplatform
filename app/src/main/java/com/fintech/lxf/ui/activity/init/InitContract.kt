@@ -1,0 +1,24 @@
+package com.fintech.lxf.ui.activity.init
+
+import android.app.Activity
+import cn.izis.yztv.base.BaseView
+import com.fintech.lxf.base.BasePresenter
+
+interface InitContract {
+    interface View: BaseView {
+        val context: Activity
+
+        fun uploadComplete(success:Boolean)
+    }
+
+    interface Presenter: BasePresenter {
+        fun startAli()
+        fun writeToCSV()
+        fun upload()
+        fun getLastFromSql()
+        /**
+         * @param clear 是否清除本地数据
+         */
+        fun exitAccount(clear:Boolean)
+    }
+}
