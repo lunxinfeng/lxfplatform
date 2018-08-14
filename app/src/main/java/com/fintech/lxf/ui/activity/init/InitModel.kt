@@ -53,7 +53,7 @@ class InitModel {
                     .forEach { it.delete() }
     }
 
-    fun writeToCSV(users: List<User>): MutableList<String> {
+    fun writeToCSV(users: List<User>,test:Boolean = false): MutableList<String> {
         val files = mutableListOf<String>()
         val n = users.size / 12000
         for (i in 0..n) {
@@ -68,7 +68,10 @@ class InitModel {
 
             users_
                     .map {
-                        arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString())
+                        if (test)
+                            arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString(),it.saveTime.toString())
+                        else
+                            arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString())
                     }
                     .forEach { writer.writeNext(it) }
 

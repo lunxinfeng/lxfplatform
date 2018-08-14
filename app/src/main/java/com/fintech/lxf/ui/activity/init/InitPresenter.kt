@@ -84,7 +84,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                 })
                 .subscribeOn(Schedulers.io())
                 .subscribe { users ->
-                    model.writeToCSV(users)
+                    model.writeToCSV(users,true)
                 }
     }
 
