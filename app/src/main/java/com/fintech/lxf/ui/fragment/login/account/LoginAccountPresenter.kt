@@ -28,7 +28,10 @@ class LoginAccountPresenter(val view: LoginAccountContract.View) : LoginAccountC
                 .subscribe(object : ProgressSubscriber<ResultEntity<Map<String, String>>>(view.context){
                     override fun _onNext(resultEntity: ResultEntity<Map<String, String>>) {
                         val result = resultEntity.result
-                        result?:return
+                        if (result == null){
+                            view.loginFail(resultEntity.subMsg)
+                            return
+                        }
                         model.saveData(result)
 
                         view.loginSuccess()

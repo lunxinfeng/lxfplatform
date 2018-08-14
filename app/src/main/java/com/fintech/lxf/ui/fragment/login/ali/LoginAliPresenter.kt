@@ -74,9 +74,11 @@ class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Pres
                                                 .observeOn(AndroidSchedulers.mainThread())
                                                 .subscribe(object : ProgressSubscriber<ResultEntity<Map<String, String>>>(view.context) {
                                                     override fun _onNext(resultEntity: ResultEntity<Map<String, String>>) {
-                                                        println("LoginActivity.onNext")
                                                         val result = resultEntity.result
-
+                                                        if (result == null){
+                                                            view.loginFail(resultEntity.subMsg)
+                                                            return
+                                                        }
                                                         model.saveData(result)
 
                                                         view.loginSuccess()

@@ -24,9 +24,10 @@ class ConfigPresenter(val view: ConfigContract.View) : ConfigContract.Presenter,
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : ProgressSubscriber<ResultEntity<Map<String, String>>>(view.context) {
-                    override fun _onNext(t: ResultEntity<Map<String, String>>?) {
-                        t?.let {
-                            if (it.subMsg.contains("用户不存在")) {
+                    override fun _onNext(resultEntity: ResultEntity<Map<String, String>>?) {
+                        resultEntity?.let {
+                            if (it.subMsg.contains("用户不存在") ||
+                                    it.subMsg.contains("通道不存在")) {
                                 Configuration.putUserInfo(Constants.KEY_ADDRESS, address)
                                 view.checkSuccess("服务器地址验证成功")
                             }
@@ -34,7 +35,8 @@ class ConfigPresenter(val view: ConfigContract.View) : ConfigContract.Presenter,
                     }
 
                     override fun _onError(error: String?) {
-                        if (error?.contains("用户不存在") == true) {
+                        if (error?.contains("用户不存在") == true ||
+                                error?.contains("通道不存在") == true) {
                             Configuration.putUserInfo(Constants.KEY_ADDRESS, address)
                             view.checkSuccess("服务器地址验证成功")
                         }else{
