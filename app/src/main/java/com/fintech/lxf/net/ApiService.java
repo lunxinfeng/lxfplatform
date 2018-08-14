@@ -16,11 +16,6 @@ import retrofit2.http.Url;
 
 public interface ApiService {
 
-    @POST("/api/terminal/v1/merchant/login")
-    Observable<ResultEntity<Map<String, String>>> login(
-            @Body SignRequestBody body
-    );
-
     @POST("/api/terminal/v1/merchant/logout")
     Observable<ResultEntity<Boolean>> logout(
             @Body SignRequestBody body
@@ -52,12 +47,12 @@ public interface ApiService {
     @POST("/api/auth/uid")
     Observable<ResultEntity<Map<String, String>>> postAliCode(@Body SignRequestBody uid);
     ///api/terminal/v1/merchant/qr_login
-    @POST("/api/terminal/v1/merchant/qr_login")
-    Observable<ResultEntity<Map<String, String>>> loginQR(
-            @Body SignRequestBody body
-    );
+//    @POST("/api/terminal/v1/merchant/qr_login")
+//    Observable<ResultEntity<Map<String, String>>> loginQR(
+//            @Body SignRequestBody body
+//    );
     @POST("/api/terminal/v1/merchant/newlogin")
-    Observable<ResultEntity<Map<String, String>>> loginJK(
+    Observable<ResultEntity<Map<String, String>>> login(
             @Body SignRequestBody body
     );
     @POST("/api/auth/uidBinding")

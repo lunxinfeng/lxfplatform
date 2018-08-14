@@ -131,9 +131,11 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                     override fun _onNext(last: User) {
                         model.last = last
                         if (last.pos_curr == BaseAccessibilityService.endPos &&
-                                last.offset == BaseAccessibilityService.offsetTotal - 1 &&
-                                Configuration.getUserInfoByKey(Constants.KEY_ALLOW_LOAD) == "1") {
-                            uploadToServer()
+                                last.offset == BaseAccessibilityService.offsetTotal - 1) {
+                            if (Configuration.getUserInfoByKey(Constants.KEY_ALLOW_LOAD) == "1")
+                                uploadToServer()
+                            else
+                                view.serverRefuseUpload()
                         }
                     }
 

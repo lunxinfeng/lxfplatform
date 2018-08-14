@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.init.InitActivity"
+    tools:context=".ui.activity.init.InitActivity"
     tools:layout_editor_absoluteY="25dp">
 
-    <EditText
-        android:id="@+id/et_ali_account"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="@string/account"
-        android:inputType="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <!--<EditText-->
+        <EditText
+            android:id="@+id/et_ali_account"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:enabled="false"
+            android:hint="@string/account"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+        <!--<EditText-->
         <!--android:id="@+id/et_ali_pos"-->
         <!--android:layout_width="0dp"-->
         <!--android:layout_height="wrap_content"-->
@@ -33,99 +41,92 @@
         <!--app:layout_constraintStart_toEndOf="@+id/et_ali_startPos"-->
         <!--app:layout_constraintTop_toBottomOf="@+id/et_ali_account" />-->
 
-    <EditText
-        android:id="@+id/et_ali_total"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="@string/total_hint"
-        android:inputType="number"
-        android:text=""
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_ali_startPos" />
+        <EditText
+            android:id="@+id/et_ali_total"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:hint="@string/total_hint"
+            android:inputType="number"
+            android:text=""
+            android:enabled="false"
+            app:layout_constraintEnd_toEndOf="@+id/et_ali_startPos"
+            app:layout_constraintStart_toStartOf="@+id/et_ali_startPos"
+            app:layout_constraintTop_toBottomOf="@+id/et_ali_startPos" />
 
 
-    <Button
-        android:id="@+id/btnAli"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/start_ali"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_ali_offsetTotal" />
+        <Button
+            android:id="@+id/btnAli"
+            style="@style/button_primary_dark"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/start_ali"
+            app:layout_constraintEnd_toEndOf="@+id/et_ali_offsetTotal"
+            app:layout_constraintStart_toStartOf="@+id/et_ali_offsetTotal"
+            app:layout_constraintTop_toBottomOf="@+id/et_ali_offsetTotal" />
 
-    <EditText
-        android:id="@+id/et_ali_startPos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="@string/pos_hint"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_ali_account" />
+        <EditText
+            android:id="@+id/et_ali_startPos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:enabled="false"
+            android:hint="@string/pos_hint"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="@+id/et_ali_account"
+            app:layout_constraintStart_toStartOf="@+id/et_ali_account"
+            app:layout_constraintTop_toBottomOf="@+id/et_ali_account" />
 
-    <EditText
-        android:id="@+id/et_ali_offsetTotal"
-        android:layout_width="0dp"
+        <EditText
+            android:id="@+id/et_ali_offsetTotal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:enabled="false"
+            android:hint="@string/offset_hint"
+            android:inputType="number"
+            app:layout_constraintEnd_toEndOf="@+id/et_ali_total"
+            app:layout_constraintStart_toStartOf="@+id/et_ali_total"
+            app:layout_constraintTop_toBottomOf="@+id/et_ali_total" />
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:theme="@style/ToolbarPopupTheme"
+            app:title="@string/init_ali"
+            app:titleTextColor="@color/white" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <com.fintech.lxf.ui.widget.CountDownButton
+        android:id="@+id/btnCSV"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="@string/offset_hint"
-        android:inputType="number"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_ali_total" />
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/transparent"
+        android:text="@string/csv"
+        android:layout_gravity="bottom|start"
+        />
 
     <Button
         android:id="@+id/btnUpload"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
-        android:text="@string/upload"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/btnAli"
-        app:layout_constraintStart_toStartOf="@+id/btnAli" />
-
-    <Button
-        android:id="@+id/btnCSV"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:text="@string/csv"
-        app:layout_constraintBottom_toTopOf="@+id/btnUpload"
-        app:layout_constraintEnd_toEndOf="@+id/btnAli"
-        app:layout_constraintStart_toStartOf="@+id/btnAli" />
-
-    <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/wechat_init"
-        android:textColor="@android:color/holo_blue_light"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/init_ali"
-        app:titleTextColor="@color/white"
-        app:theme="@style/ToolbarPopupTheme"/>
-
-</android.support.constraint.ConstraintLayout>
+        android:background="@color/transparent"
+        android:text="@string/upload"
+        android:layout_gravity="bottom|end" />
+</android.support.design.widget.CoordinatorLayout>

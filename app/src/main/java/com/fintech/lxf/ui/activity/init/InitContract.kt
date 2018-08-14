@@ -9,6 +9,7 @@ interface InitContract {
         val context: Activity
 
         fun uploadComplete(success:Boolean)
+        fun serverRefuseUpload()
     }
 
     interface Presenter: BasePresenter {

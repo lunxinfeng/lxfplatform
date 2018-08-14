@@ -3,6 +3,7 @@ package com.fintech.lxf.ui.activity.init
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -45,10 +46,10 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
         et_ali_offsetTotal.onChange { BaseAccessibilityService.offsetTotal = it?.toString()?.toIntOrNull() ?: 5 }
 
         btnAli.setOnClickListener { prestener.startAli() }
-        btnCSV.setOnClickListener { prestener.writeToCSV() }
+        btnCSV.setOnClickWithCountDownListener { prestener.writeToCSV() }
         btnUpload.setOnClickListener { prestener.upload() }
 
-        et_ali_account.setText(Configuration.getUserInfoByKey(KEY_USER_NAME))
+        et_ali_account.setText(Configuration.getUserInfoByKey(KEY_ACCOUNT))
         et_ali_startPos.setText(Configuration.getUserInfoByKey(KEY_BEGIN_NUM))
         et_ali_total.setText(Configuration.getUserInfoByKey(KEY_END_NUM))
         et_ali_offsetTotal.setText(Configuration.getUserInfoByKey(KEY_MAX_NUM))
@@ -89,10 +90,16 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
     override fun uploadComplete(success: Boolean) {
         val info = if (success) "提交本地数据成功" else "提交本地数据失败"
 
-        AlertDialog.Builder(this)
-                .setMessage(info)
-                .setPositiveButton("确定") { dialog, _ -> dialog?.dismiss() }
-                .show()
+        if (success)
+            SnackUtil.IndefiniteSnackbar(root,info,SnackUtil.Confirm).show()
+        else
+            SnackUtil.IndefiniteSnackbar(root,info,Color.WHITE,SnackUtil.red,SnackUtil.red,SnackUtil.orange,"重新提交"){
+                prestener.upload()
+            }.show()
+    }
+
+    override fun serverRefuseUpload() {
+        SnackUtil.IndefiniteSnackbar(root,"服务器拒绝上传",SnackUtil.Warning).show()
     }
 
     @AfterPermissionGranted(ALL_PERMISSION)

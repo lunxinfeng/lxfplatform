@@ -24,6 +24,7 @@ public class LoginModel {
                     @Override
                     public void accept(Integer integer) throws Exception {
                         DB.deleteTable(context);
+                        Configuration.removeUserInfoByKey(KEY_ACCOUNT);
                         Configuration.removeUserInfoByKey(KEY_ALLOW_LOAD);
                         Configuration.removeUserInfoByKey(KEY_BEGIN_NUM);
                         Configuration.removeUserInfoByKey(KEY_END_NUM);
@@ -38,6 +39,7 @@ public class LoginModel {
         Configuration.putUserInfo(KEY_MCH_ID, result.get(KEY_MCH_ID));
         Configuration.putUserInfo(KEY_LOGIN_TOKEN, result.get(KEY_LOGIN_TOKEN));
 
+        Configuration.putUserInfo(KEY_ACCOUNT, result.get(KEY_ACCOUNT));
         Configuration.putUserInfo(KEY_ALLOW_LOAD, result.get(KEY_ALLOW_LOAD));
         Configuration.putUserInfo(KEY_BEGIN_NUM, result.get(KEY_BEGIN_NUM));
         Configuration.putUserInfo(KEY_END_NUM, result.get(KEY_END_NUM));

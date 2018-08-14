@@ -5,6 +5,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.app.Fragment
 import android.content.Intent
+import android.transition.Fade
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ class LoginAccountFragment : BaseFragment(),LoginAccountContract.View {
     override val context: Activity
         get() = activity
     private val presenter = LoginAccountPresenter(this)
+    private var btnBind:Button? = null
 
     override fun loginSuccess() {
         startActivity(Intent(activity, InitActivity::class.java))
@@ -37,19 +39,24 @@ class LoginAccountFragment : BaseFragment(),LoginAccountContract.View {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val btnBind = view.findViewById<Button>(R.id.btnBind)
+        btnBind = view.findViewById<Button>(R.id.btnBind)
         val et_account = view.findViewById<EditText>(R.id.et_account)
         val et_password = view.findViewById<EditText>(R.id.et_password)
-        btnBind.transitionName = "login"
+        btnBind?.transitionName = "login"
 
-        btnBind.setOnClickListener { presenter.accountLogin(et_account.text.toString(),et_password.text.toString()) }
+        btnBind?.setOnClickListener { presenter.accountLogin(et_account.text.toString(),et_password.text.toString()) }
     }
 
     fun back(){
+        val fragment = LoginAliFragment.newInstance()
+        fragment.sharedElementEnterTransition = Fade()
+        fragment.enterTransition = Fade()
+        exitTransition = Fade()
+        fragment.sharedElementReturnTransition = Fade()
         fragmentManager
                 .beginTransaction()
-//                    .addSharedElement(btnLoginAli, "login")
-                .replace(R.id.frame_content, LoginAliFragment.newInstance())
+                .addSharedElement(btnBind, "login")
+                .replace(R.id.frame_content, fragment)
                 .commit()
     }
 

@@ -30,6 +30,7 @@ public class Constants {
     public static final String KEY_PASSWORD = "password";
     public static final String KEY_ADDRESS = "address";
     public static final String KEY_LOGIN_TOKEN = "loginToken";
+    public static final String KEY_ACCOUNT = "account";
     public static final String KEY_ALLOW_LOAD = "allowLoad";
     public static final String KEY_BEGIN_NUM = "beginNum";
     public static final String KEY_END_NUM = "endNum";
