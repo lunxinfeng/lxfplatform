@@ -42,7 +42,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onResume() {
-        if (Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT) != "1")
+        if (Configuration.getUserInfoByKey(Constants.KEY_ALLOW_LOAD) != "1")
             view.serverRefuseUpload()
         getLastFromSql()
     }
