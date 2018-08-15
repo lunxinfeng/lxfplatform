@@ -1,7 +1,7 @@
 package com.fintech.lxf.ui.activity.config
 
 import android.content.Context
-import cn.izis.yztv.base.BaseView
+import com.fintech.lxf.base.BaseView
 import com.fintech.lxf.base.BasePresenter
 
 

@@ -1,7 +1,7 @@
 package com.fintech.lxf.ui.fragment.login.account
 
 import android.app.Activity
-import cn.izis.yztv.base.BaseView
+import com.fintech.lxf.base.BaseView
 import com.fintech.lxf.base.BasePresenter
 
 interface LoginAccountContract {
