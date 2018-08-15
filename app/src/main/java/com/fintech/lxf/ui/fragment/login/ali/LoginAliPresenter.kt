@@ -1,6 +1,7 @@
 package com.fintech.lxf.ui.fragment.login.ali
 
 import android.arch.lifecycle.LifecycleObserver
+import android.text.TextUtils
 import com.alipay.sdk.app.AuthTask
 import com.fintech.lxf.net.ProgressSubscriber
 import com.fintech.lxf.net.ResultEntity
@@ -14,6 +15,7 @@ import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import java.lang.Exception
 import java.util.HashMap
 
 class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Presenter, LifecycleObserver {
@@ -32,23 +34,13 @@ class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Pres
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(Function<Map<String, String>, ObservableSource<String>> { stringStringMap ->
                     val authResult = AuthResult(stringStringMap, true)
-//                    val resultStatus = authResult.getResultStatus()
-//
-//                    // 判断resultStatus 为“9000”且result_code
-//                    // 为“200”则代表授权成功，具体状态码代表含义可参考授权接口文档
-//                    if (TextUtils.equals(resultStatus, "9000") && TextUtils.equals(authResult.getResultCode(), "200")) {
-//                        // 获取alipay_open_id，调支付时作为参数extern_token 的value
-//                        // 传入，则支付账户为该授权账户
-//                        Toast.makeText(view.context,
-//                                "授权成功\n" + String.format("authCode:%s", authResult.getAuthCode()) + authResult.getAlipayOpenId(), Toast.LENGTH_SHORT)
-//                                .show()
-//                    } else {
-//                        // 其他状态值则为授权失败
-//                        Toast.makeText(view.context,
-//                                "授权失败" + String.format("authCode:%s", authResult.getAuthCode()), Toast.LENGTH_SHORT).show()
-//
-//                    }
-                    Observable.just(authResult.getAlipayUserId())
+                    val resultStatus = authResult.resultStatus
+
+                    if (TextUtils.equals(resultStatus, "9000") && TextUtils.equals(authResult.resultCode, "200")){
+                        Observable.just(authResult.alipayUserId)
+                    }else{
+                        Observable.error(Exception("授权失败"))
+                    }
                 })
                 .observeOn(Schedulers.io())
                 .flatMap(Function<String, ObservableSource<ResultEntity<Map<String, String>>>> { uid ->

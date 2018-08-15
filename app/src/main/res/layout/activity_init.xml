@@ -17,14 +17,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:ems="10"
             android:enabled="false"
             android:hint="@string/account"
             android:inputType="text"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <!--<EditText-->
@@ -47,10 +47,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:ems="10"
+            android:enabled="false"
             android:hint="@string/total_hint"
             android:inputType="number"
             android:text=""
-            android:enabled="false"
             app:layout_constraintEnd_toEndOf="@+id/et_ali_startPos"
             app:layout_constraintStart_toStartOf="@+id/et_ali_startPos"
             app:layout_constraintTop_toBottomOf="@+id/et_ali_startPos" />
@@ -64,7 +64,7 @@
             android:layout_marginTop="16dp"
             android:text="@string/start_ali"
             app:layout_constraintEnd_toEndOf="@+id/et_ali_offsetTotal"
-            app:layout_constraintStart_toStartOf="@+id/et_ali_offsetTotal"
+            app:layout_constraintStart_toStartOf="@+id/textView6"
             app:layout_constraintTop_toBottomOf="@+id/et_ali_offsetTotal" />
 
         <EditText
@@ -107,26 +107,46 @@
             app:title="@string/init_ali"
             app:titleTextColor="@color/white" />
 
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:text="支付宝账号："
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/et_ali_account"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="起始金额："
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/et_ali_startPos"
+            app:layout_constraintEnd_toEndOf="@+id/textView"
+            app:layout_constraintStart_toStartOf="@+id/textView" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="结束金额："
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/et_ali_total"
+            app:layout_constraintEnd_toEndOf="@+id/textView2"
+            app:layout_constraintStart_toStartOf="@+id/textView2" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="并发数量："
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/et_ali_offsetTotal"
+            app:layout_constraintEnd_toEndOf="@+id/textView3"
+            app:layout_constraintStart_toStartOf="@+id/textView3" />
+
     </android.support.constraint.ConstraintLayout>
 
-    <com.fintech.lxf.ui.widget.CountDownButton
-        android:id="@+id/btnCSV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginStart="16dp"
-        android:background="@color/transparent"
-        android:text="@string/csv"
-        android:layout_gravity="bottom|start"
-        />
-
-    <Button
-        android:id="@+id/btnUpload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/transparent"
-        android:text="@string/upload"
-        android:layout_gravity="bottom|end" />
 </android.support.design.widget.CoordinatorLayout>

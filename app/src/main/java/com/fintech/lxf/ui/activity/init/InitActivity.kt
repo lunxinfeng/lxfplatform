@@ -46,14 +46,11 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
         et_ali_offsetTotal.onChange { BaseAccessibilityService.offsetTotal = it?.toString()?.toIntOrNull() ?: 5 }
 
         btnAli.setOnClickListener { prestener.startAli() }
-        btnCSV.setOnClickWithCountDownListener { prestener.writeToCSV() }
-        btnUpload.setOnClickListener { prestener.upload() }
 
         et_ali_account.setText(Configuration.getUserInfoByKey(KEY_ACCOUNT))
         et_ali_startPos.setText(Configuration.getUserInfoByKey(KEY_BEGIN_NUM))
         et_ali_total.setText(Configuration.getUserInfoByKey(KEY_END_NUM))
         et_ali_offsetTotal.setText(Configuration.getUserInfoByKey(KEY_MAX_NUM))
-        btnUpload.isEnabled = Configuration.getUserInfoByKey(KEY_USER_NAME) == "1"
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -74,6 +71,17 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
                         }
                         .show()
             }
+            R.id.action_csv ->{
+                AlertDialog.Builder(this)
+                        .setMessage("生成本地文件")
+                        .setPositiveButton("生成csv") { _, _ ->
+                            prestener.writeToCSV(".csv")
+                        }
+                        .setNegativeButton("生成txt") { _, _ ->
+                            prestener.writeToCSV(".txt")
+                        }
+                        .show()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -90,8 +98,11 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
     override fun uploadComplete(success: Boolean) {
         val info = if (success) "提交本地数据成功" else "提交本地数据失败"
 
-        if (success)
+        if (success){
             SnackUtil.IndefiniteSnackbar(root,info,SnackUtil.Confirm).show()
+            btnAli.text = "当前账户二维码已同步"
+            btnAli.isEnabled = false
+        }
         else
             SnackUtil.IndefiniteSnackbar(root,info,Color.WHITE,SnackUtil.red,SnackUtil.red,SnackUtil.orange,"重新提交"){
                 prestener.upload()
@@ -100,6 +111,8 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
 
     override fun serverRefuseUpload() {
         SnackUtil.IndefiniteSnackbar(root,"服务器拒绝上传",SnackUtil.Warning).show()
+        btnAli.text = "当前账户二维码已同步"
+        btnAli.isEnabled = false
     }
 
     @AfterPermissionGranted(ALL_PERMISSION)

@@ -9,12 +9,12 @@ public class DB {
         return AppDatabase.getInstance(context).userDao().insertUser(user);
     }
 
-    public static User queryLast(Context context,int type){
-        return AppDatabase.getInstance(context).userDao().queryLast(type);
+    public static User queryLast(Context context,int type,String account){
+        return AppDatabase.getInstance(context).userDao().queryLast(type,account);
     }
 
-    public static List<User> queryAll(Context context, int type){
-        return AppDatabase.getInstance(context).userDao().queryAll(type);
+    public static List<User> queryAll(Context context, int type,String account){
+        return AppDatabase.getInstance(context).userDao().queryAll(type,account);
     }
 
     public static int deleteAll(Context context, User... users){
@@ -24,8 +24,8 @@ public class DB {
         AppDatabase.getInstance(context).userDao().delTable();
     }
 
-    public static List<User> queryQrNull(Context context, int type){
-        return AppDatabase.getInstance(context).userDao().queryQrNull(type);
+    public static List<User> queryQrNull(Context context, int type,String account){
+        return AppDatabase.getInstance(context).userDao().queryQrNull(type,account);
     }
 
 }

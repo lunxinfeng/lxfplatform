@@ -14,7 +14,7 @@ interface InitContract {
 
     interface Presenter: BasePresenter {
         fun startAli()
-        fun writeToCSV()
+        fun writeToCSV(type:String)
         fun upload()
         fun getLastFromSql()
         /**

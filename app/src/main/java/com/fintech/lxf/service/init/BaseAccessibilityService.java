@@ -483,7 +483,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                         SystemClock.sleep(3000);
                         Intent intent = new Intent(BaseAccessibilityService.this, InitActivity.class);
                         BaseAccessibilityService.this.startActivity(intent);
-                        List<User> users = DB.queryAll(BaseAccessibilityService.this, getType());
+                        List<User> users = DB.queryAll(BaseAccessibilityService.this, getType(),getAccount());
                         if (users != null)
                             emitter.onNext(users);
                         emitter.onComplete();

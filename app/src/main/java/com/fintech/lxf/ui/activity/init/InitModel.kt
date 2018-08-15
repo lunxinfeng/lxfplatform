@@ -29,7 +29,7 @@ class InitModel {
     }
 
     fun reStart(){
-        val acc = last?.account?:Configuration.getUserInfoByKey(Constants.KEY_USER_NAME)
+        val acc = last?.account?:Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT)
         val pos = last?.pos_curr ?: BaseAccessibilityService.startPos
         val offset = last?.offset ?: 0
         val beishu = 100
@@ -53,17 +53,18 @@ class InitModel {
                     .forEach { it.delete() }
     }
 
-    fun writeToCSV(users: List<User>,test:Boolean = false): MutableList<String> {
+    fun writeToCSV(users: List<User>,type:String = ".txt",test:Boolean = false): MutableList<String> {
         val files = mutableListOf<String>()
-        val n = users.size / 12000
+        val step = if (test) (users.size + 1) else 12000
+        val n = users.size / step
         for (i in 0..n) {
-            val start = i * 12000
-            val end = (i + 1) * 12000
+            val start = i * step
+            val end = (i + 1) * step
             val users_ = users.subList(start, if (end > users.size) users.size else end)
 
-            val index = if (i == n) 10000 else i
+            val index = if (i == n && !test) 10000 else i
             val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/ali-" +
-                    SPHelper.getInstance().getString(AliPayUI.acc) + "-" + i + "-all" + ".txt"
+                    Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT) + "-" + i + "-all" + type
             val writer = CSVWriter(OutputStreamWriter(FileOutputStream(filePath, true), "GBK"))
 
             users_

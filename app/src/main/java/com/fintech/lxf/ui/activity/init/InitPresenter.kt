@@ -42,6 +42,8 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onResume() {
+        if (Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT) != "1")
+            view.serverRefuseUpload()
         getLastFromSql()
     }
 
@@ -74,17 +76,17 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
         Utils.launchAlipayAPP(view.context)
     }
 
-    override fun writeToCSV() {
+    override fun writeToCSV(type:String) {
         Single
                 .create(SingleOnSubscribe<List<User>> { emitter ->
                     model.delLocalCSV()
-                    val users = DB.queryAll(view.context, BaseAccessibilityService.TYPE_ALI)
+                    val users = DB.queryAll(view.context, BaseAccessibilityService.TYPE_ALI,Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
                     if (users != null)
                         emitter.onSuccess(users)
                 })
                 .subscribeOn(Schedulers.io())
                 .subscribe { users ->
-                    model.writeToCSV(users,true)
+                    model.writeToCSV(users,type,true)
                 }
     }
 
@@ -103,7 +105,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     override fun getLastFromSql() {
         Observable
                 .create<User> { emitter ->
-                    val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI)
+                    val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI,Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
                     if (last != null)
                         emitter.onNext(last)
                     emitter.onComplete()
@@ -149,7 +151,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
         Observable
                 .create<List<User>> { emitter ->
                     model.delLocalCSV()
-                    val users = DB.queryAll(view.context, BaseAccessibilityService.TYPE_ALI)
+                    val users = DB.queryAll(view.context, BaseAccessibilityService.TYPE_ALI,Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
                     if (users != null)
                         emitter.onNext(users)
                     emitter.onComplete()

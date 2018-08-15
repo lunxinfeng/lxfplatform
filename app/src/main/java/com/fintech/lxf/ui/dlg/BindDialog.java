@@ -22,14 +22,12 @@ public class BindDialog extends Dialog {
         super(context);
         this.clickListener = clickListener;
         this.type = type;
-        setCancelable(false);
     }
 
     public BindDialog(@NonNull Context context,int type, int themeResId, ClickListener clickListener) {
         super(context, themeResId);
         this.clickListener = clickListener;
         this.type = type;
-        setCancelable(false);
     }
 
     protected BindDialog(@NonNull Context context,int type , boolean cancelable, ClickListener clickListener, @Nullable OnCancelListener cancelListener) {

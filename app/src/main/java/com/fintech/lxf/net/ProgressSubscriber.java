@@ -137,7 +137,7 @@ public abstract class ProgressSubscriber<T> implements Observer<T> {
         } else if (e instanceof ServerException) {
             _onError(e.getMessage());
         } else {
-            _onError("错误：" + e.getMessage());
+            _onError(e.getMessage());
         }
         dismissProgressDialog();
     }
