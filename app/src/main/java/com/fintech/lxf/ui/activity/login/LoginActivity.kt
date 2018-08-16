@@ -19,6 +19,7 @@ class LoginActivity : BaseActivity() {
         if (Configuration.noAddress()) {
             startActivity(Intent(this,ConfigActivity::class.java))
             finish()
+            return
         } else {
             Constants.baseUrl = Configuration.getUserInfoByKey(Constants.KEY_ADDRESS)
         }

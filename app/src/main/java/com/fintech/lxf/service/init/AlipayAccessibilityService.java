@@ -89,6 +89,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
 //                            clearLocalPic();
                             input();
                             click(amount_btnSure());
+                            reStartNum = 0;
                         }
                         break;
                     case "com.alipay.mobile.framework.app.ui.DialogHelper$APGenericProgressDialog":
@@ -113,19 +114,23 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                                 List<AccessibilityNodeInfo> node = root.findAccessibilityNodeInfosByText("清除金额");
                                 if (node != null && node.size() > 0) {
 
-
                                     clearLocalPic();
                                     File file = getPicFile();
                                     File[] files = file.listFiles();
                                     debug(TAG, "本地图片数量：" + (files == null ? 0 : files.length));
-                                    click(qr_save());
-                                }
 
-                                if (steep == 0 || (steep == 4 && reStartNum > 0)) {
-                                    List<AccessibilityNodeInfo> node_2 = root.findAccessibilityNodeInfosByText("设置金额");
-                                    if (node_2 != null && node_2.size() > 0) {
-                                        node_2.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                        debug(TAG, "click-------->设置金额");
+                                    if ((steep == 4 && reStartNum > 0)){
+                                        node.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                    }else{
+                                        click(qr_save());
+                                    }
+                                }else {
+                                    if (steep == 0 || (steep == 4 && reStartNum > 0)) {
+                                        List<AccessibilityNodeInfo> node_2 = root.findAccessibilityNodeInfosByText("设置金额");
+                                        if (node_2 != null && node_2.size() > 0) {
+                                            node_2.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                            debug(TAG, "click-------->设置金额");
+                                        }
                                     }
                                 }
                             }

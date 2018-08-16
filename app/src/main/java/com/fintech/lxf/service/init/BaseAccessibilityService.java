@@ -237,11 +237,13 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         Arrays.sort(files);
         try {
             save(files);
-            posAddAdd();
+
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             clearLocalPic();
+        }finally {
+            posAddAdd();
         }
         return false;
     }
