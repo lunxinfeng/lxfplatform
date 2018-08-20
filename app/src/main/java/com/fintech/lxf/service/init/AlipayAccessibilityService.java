@@ -312,11 +312,13 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                     public void onError(Throwable e) {
                         e.printStackTrace();
                         d.dispose();
+                        db();
                     }
 
                     @Override
                     public void onComplete() {
                         d.dispose();
+                        db();
                     }
                 });
     }

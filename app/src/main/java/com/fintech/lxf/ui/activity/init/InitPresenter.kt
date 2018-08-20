@@ -28,6 +28,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class InitPresenter(val view: InitContract.View) : InitContract.Presenter, LifecycleObserver {
@@ -120,11 +121,14 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                             startAli()
                         }
                         InitModel.STRAT_TYPE_KILL_BACKGROUND -> {
-                            SystemClock.sleep(4000)
-                            val am = view.context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                            am.killBackgroundProcesses("com.eg.android.AlipayGphone")
-                            SystemClock.sleep(1000)
-                            startAli()
+                            Timer().schedule(object : TimerTask() {
+                                override fun run() {
+                                    val am = view.context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                                    am.killBackgroundProcesses("com.eg.android.AlipayGphone")
+                                    SystemClock.sleep(1000)
+                                    startAli()
+                                }
+                            },20*1000)
                         }
                     }
                     model.startType = 0
