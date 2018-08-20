@@ -183,7 +183,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                     map.put("version", desBody3)
 
                     ApiProducerModule.create(ApiService::class.java)
-                            .upload("http://api.trueinfo.cn/api/upload/uploadfile", map, body)
+                            .upload(map, body)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete {

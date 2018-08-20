@@ -28,29 +28,17 @@ public interface ApiService {
     );
 
 
-
-
-//    @Multipart
-//    @POST
-//    Observable<ResponseBody> upload(@Url String url,
-//                                               @PartMap Map<String, RequestBody> params,
-//                                               @Part List<MultipartBody.Part> parts);
-
     @Multipart
-    @POST
-    Observable<ResponseBody> upload(@Url String url,
-                                    @PartMap Map<String, okhttp3.RequestBody> params,
+    @POST("/api/upload/uploadfile")
+    Observable<ResponseBody> upload(@PartMap Map<String, okhttp3.RequestBody> params,
                                     @Part MultipartBody.Part part);
 
     @POST("/api/auth/info")
     Observable<ResultEntity<Map<String, String>>> getAliLoginUrl();
+
     @POST("/api/auth/uid")
     Observable<ResultEntity<Map<String, String>>> postAliCode(@Body SignRequestBody uid);
-    ///api/terminal/v1/merchant/qr_login
-//    @POST("/api/terminal/v1/merchant/qr_login")
-//    Observable<ResultEntity<Map<String, String>>> loginQR(
-//            @Body SignRequestBody body
-//    );
+
     @POST("/api/terminal/v1/merchant/newlogin")
     Observable<ResultEntity<Map<String, String>>> login(
             @Body SignRequestBody body
