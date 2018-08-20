@@ -1,6 +1,7 @@
 package com.fintech.lxf.ui.fragment.login.account
 
 import android.arch.lifecycle.LifecycleObserver
+import com.fintech.lxf.App
 import com.fintech.lxf.net.ProgressSubscriber
 import com.fintech.lxf.net.ResultEntity
 import com.fintech.lxf.net.SignRequestBody
@@ -18,6 +19,8 @@ class LoginAccountPresenter(val view: LoginAccountContract.View) : LoginAccountC
         request.put("userName", name)
         request.put("password", password)
         request.put("payMethod", "2001")
+        request.put("app_version", App.getAppContext().packageManager
+                .getPackageInfo(App.getAppContext().packageName,0).versionCode.toString())
         login(request)
     }
 
@@ -29,7 +32,7 @@ class LoginAccountPresenter(val view: LoginAccountContract.View) : LoginAccountC
                     override fun _onNext(resultEntity: ResultEntity<Map<String, String>>) {
                         val result = resultEntity.result
                         if (result == null){
-                            view.loginFail(resultEntity.subMsg)
+                            view.loginFail(resultEntity.subMsg?:resultEntity.msg)
                             return
                         }
                         model.saveData(result)

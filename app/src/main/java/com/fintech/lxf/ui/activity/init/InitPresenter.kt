@@ -163,7 +163,8 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                 .subscribeOn(Schedulers.io())
                 .flatMap { users ->
                     val files = model.writeToCSV(users)
-                    Observable.fromIterable(files)
+//                    Observable.fromIterable(files)
+                    Observable.just(files)
                 }
                 .flatMap { path ->
                     val file = File(path.split(";")[0])

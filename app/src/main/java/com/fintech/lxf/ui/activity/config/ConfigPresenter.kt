@@ -1,6 +1,7 @@
 package com.fintech.lxf.ui.activity.config
 
 import android.arch.lifecycle.LifecycleObserver
+import com.fintech.lxf.App
 import com.fintech.lxf.net.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -19,6 +20,8 @@ class ConfigPresenter(val view: ConfigContract.View) : ConfigContract.Presenter,
         val request = HashMap<String, String>()
         request.put("userName", "13397610459@001")
         request.put("password", "123456")
+        request.put("app_version", App.getAppContext().packageManager
+                .getPackageInfo(App.getAppContext().packageName,0).versionCode.toString())
 
         service.login(SignRequestBody(request))
                 .subscribeOn(Schedulers.io())

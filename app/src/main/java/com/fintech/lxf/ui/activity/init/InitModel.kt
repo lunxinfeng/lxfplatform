@@ -53,34 +53,51 @@ class InitModel {
                     .forEach { it.delete() }
     }
 
-    fun writeToCSV(users: List<User>,type:String = ".txt",test:Boolean = false): MutableList<String> {
-        val files = mutableListOf<String>()
-        val step = if (test) (users.size + 1) else 12000
-        val n = users.size / step
-        for (i in 0..n) {
-            val start = i * step
-            val end = (i + 1) * step
-            val users_ = users.subList(start, if (end > users.size) users.size else end)
+    fun writeToCSV(users: List<User>,type:String = ".txt",test:Boolean = false): String {
+        val index = 10000
+        val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/ali-" +
+                Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT) + "-" + index + "-all" + type
+        val writer = CSVWriter(OutputStreamWriter(FileOutputStream(filePath, true), "GBK"))
 
-            val index = if (i == n && !test) 10000 else i
-            val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/ali-" +
-                    Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT) + "-" + i + "-all" + type
-            val writer = CSVWriter(OutputStreamWriter(FileOutputStream(filePath, true), "GBK"))
+        users
+                .map {
+                    if (test)
+                        arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString(),it.saveTime.toString())
+                    else
+                        arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString())
+                }
+                .forEach { writer.writeNext(it) }
 
-            users_
-                    .map {
-                        if (test)
-                            arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString(),it.saveTime.toString())
-                        else
-                            arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString())
-                    }
-                    .forEach { writer.writeNext(it) }
+        writer.close()
 
-            writer.close()
-
-            files.add("$filePath;$index")
-        }
-        return files
+        return "$filePath;$index"
+//        val files = mutableListOf<String>()
+//        val step = if (test) (users.size + 1) else 12000
+//        val n = users.size / step
+//        for (i in 0..n) {
+//            val start = i * step
+//            val end = (i + 1) * step
+//            val users_ = users.subList(start, if (end > users.size) users.size else end)
+//
+//            val index = if (i == n && !test) 10000 else i
+//            val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/ali-" +
+//                    Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT) + "-" + i + "-all" + type
+//            val writer = CSVWriter(OutputStreamWriter(FileOutputStream(filePath, true), "GBK"))
+//
+//            users_
+//                    .map {
+//                        if (test)
+//                            arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString(),it.saveTime.toString())
+//                        else
+//                            arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString())
+//                    }
+//                    .forEach { writer.writeNext(it) }
+//
+//            writer.close()
+//
+//            files.add("$filePath;$index")
+//        }
+//        return files
     }
 
     fun clearQRData(context: Context){
