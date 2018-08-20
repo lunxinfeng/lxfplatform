@@ -32,7 +32,7 @@
         <!-- AccessibilityService -->
         <service
             android:name=".service.init.AlipayAccessibilityService"
-            android:label="离线付支付宝辅助"
+            android:label="随便截支付宝辅助"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />

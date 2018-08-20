@@ -19,8 +19,8 @@
     <string name="offset_curr">当前偏移量: 默认 0</string>
     <string name="start_ali">启动支付宝</string>
     <string name="start_wechat">启动微信</string>
-    <string name="ali_accessibility_description">驰迅科技提供: 支付宝辅助</string>
-    <string name="wx_accessibility_description">驰迅科技提供: 微信辅助</string>
+    <string name="ali_accessibility_description">隐智科技提供: 支付宝辅助</string>
+    <string name="wx_accessibility_description">隐智科技提供: 微信辅助</string>
     <string name="upload">上传</string>
     <string name="csv">生成CSV</string>
     <string name="wechat_init">微信随便截</string>
