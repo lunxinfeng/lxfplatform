@@ -4,11 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import com.fintech.lxf.R
 import com.fintech.lxf.base.BaseActivity
+import com.fintech.lxf.helper.clickN
 import com.fintech.lxf.net.Configuration
 import com.fintech.lxf.net.Constants
 import com.fintech.lxf.ui.activity.config.ConfigActivity
 import com.fintech.lxf.ui.fragment.login.account.LoginAccountFragment
 import com.fintech.lxf.ui.fragment.login.ali.LoginAliFragment
+import kotlinx.android.synthetic.main.activity_login2.*
 
 class LoginActivity : BaseActivity() {
 
@@ -28,6 +30,13 @@ class LoginActivity : BaseActivity() {
                 .beginTransaction()
                 .add(R.id.frame_content,LoginAliFragment.newInstance())
                 .commit()
+
+        app_bar_image.clickN(7,"进入账号登录"){
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.frame_content,LoginAccountFragment.newInstance())
+                    .commit()
+        }
     }
 
     override fun onBackPressed() {

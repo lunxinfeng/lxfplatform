@@ -45,15 +45,7 @@ class LoginAliFragment : BaseFragment(),LoginAliContract.View {
         fragment.sharedElementReturnTransition = Fade()
 
         val btnLoginAli = view.findViewById<Button>(R.id.btnLoginAli)
-        val tvLoginAccount = view.findViewById<TextView>(R.id.tvLoginAccount)
         btnLoginAli.setOnClickListener { presenter.aliLogin() }
-        tvLoginAccount.setOnClickListener {
-            fragmentManager
-                    .beginTransaction()
-                    .addSharedElement(btnLoginAli, "login")
-                    .replace(R.id.frame_content,fragment)
-                    .commit()
-        }
     }
 
     companion object {
