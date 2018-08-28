@@ -28,12 +28,25 @@ class InitModel {
         val STRAT_TYPE_KILL_BACKGROUND = 2000
     }
 
-    fun reStart(){
-        val acc = last?.account?:Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT)
-        val pos = last?.pos_curr ?: BaseAccessibilityService.startPos
-        val offset = last?.offset ?: 0
+    fun reStart() {
+        val acc = last?.account ?: Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT)
+        val pos = if (BaseAccessibilityService.singleMode) {
+            if (BaseAccessibilityService.singleCurr == -1)
+                BaseAccessibilityService.singleCurr = BaseAccessibilityService.singleSet.poll()
+            BaseAccessibilityService.startPos = BaseAccessibilityService.singleCurr
+            BaseAccessibilityService.startPos
+        } else
+            last?.pos_curr ?: BaseAccessibilityService.startPos
+        val offset = if (BaseAccessibilityService.singleMode)
+            0
+        else
+            last?.offset ?: 0
         val beishu = 100
-        val end = last?.pos_end ?: BaseAccessibilityService.endPos
+        val end = if (BaseAccessibilityService.singleMode) {
+            BaseAccessibilityService.endPos = BaseAccessibilityService.singleCurr
+            BaseAccessibilityService.endPos
+        } else
+            last?.pos_end ?: BaseAccessibilityService.endPos
 
         SPHelper.getInstance().putString(AliPayUI.acc, acc)
         SPHelper.getInstance().putInt(AliPayUI.posV, pos)
@@ -53,8 +66,13 @@ class InitModel {
                     .forEach { it.delete() }
     }
 
-    fun writeToCSV(users: List<User>,type:String = ".txt",test:Boolean = false): String {
-        val index = 10000
+    /**
+     * @param users 数据库的数据
+     * @param type 生成文件格式
+     * @param test 是否手工生成文件
+     */
+    fun writeToCSV(users: List<User>, type: String = ".txt", test: Boolean = false): String {
+        val index = if (BaseAccessibilityService.singleMode) 1 else 10000
         val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/ali-" +
                 Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT) + "-" + index + "-all" + type
         val writer = CSVWriter(OutputStreamWriter(FileOutputStream(filePath, true), "GBK"))
@@ -62,7 +80,7 @@ class InitModel {
         users
                 .map {
                     if (test)
-                        arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString(),it.saveTime.toString())
+                        arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString(), it.saveTime.toString())
                     else
                         arrayOf(it.qr_str, ((it.pos_curr * it.multiple - it.offset) / 100.0).toString())
                 }
@@ -100,7 +118,7 @@ class InitModel {
 //        return files
     }
 
-    fun clearQRData(context: Context){
+    fun clearQRData(context: Context) {
         Single.just(1)
                 .subscribeOn(Schedulers.io())
                 .subscribe(Consumer {
@@ -113,7 +131,7 @@ class InitModel {
                 })
     }
 
-    fun clearUserInfo(){
+    fun clearUserInfo() {
         Configuration.clearUserInfo()
     }
 }

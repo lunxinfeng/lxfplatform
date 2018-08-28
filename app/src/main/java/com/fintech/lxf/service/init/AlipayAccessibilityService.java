@@ -262,7 +262,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                             reStartNum = 0;
                         } else {
                             long currTime = System.currentTimeMillis();
-                            User last = DB.queryLast(AlipayAccessibilityService.this, TYPE_ALI,getAccount());
+                            User last = DB.queryLast(AlipayAccessibilityService.this, TYPE_ALI,getAccount(),singleMode?2:1);
                             long lastTime = last == null ? 0 : last.saveTime;
                             if (currTime - Math.max(lastTime, lastReStart) > 30 * 1000) {
                                 lastReStart = currTime;

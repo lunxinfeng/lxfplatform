@@ -106,7 +106,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     override fun getLastFromSql() {
         Observable
                 .create<User> { emitter ->
-                    val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI,Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
+                    val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI,Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT),if (BaseAccessibilityService.singleMode)2 else 1)
                     if (last != null)
                         emitter.onNext(last)
                     emitter.onComplete()
@@ -137,11 +137,12 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                     override fun _onNext(last: User) {
                         model.last = last
                         if (last.pos_curr == BaseAccessibilityService.endPos &&
-                                last.offset == BaseAccessibilityService.offsetTotal - 1) {
+                                last.offset == BaseAccessibilityService.offsetTotal - 1 &&
+                                (!BaseAccessibilityService.singleMode || BaseAccessibilityService.singleSet.size == 0)) {
                             if (Configuration.getUserInfoByKey(Constants.KEY_ALLOW_LOAD) == "1")
                                 uploadToServer()
                             else
-                                view.serverRefuseUpload()
+                                view.serverRefuseUpload(BaseAccessibilityService.singleMode)
                         }
                     }
 
@@ -192,8 +193,9 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                 .subscribe(object : ProgressSubscriber<ResponseBody>(view.context) {
                     override fun _onNext(t: ResponseBody) {
                         if (t.string().contains("success")) {
-                            Configuration.putUserInfo(Constants.KEY_ALLOW_LOAD, "-1")
-                            view.uploadComplete(true)
+                            if (!BaseAccessibilityService.singleMode)
+                                Configuration.putUserInfo(Constants.KEY_ALLOW_LOAD, "-1")
+                            view.uploadComplete(true,BaseAccessibilityService.singleMode)
                         } else
                             view.uploadComplete(false)
 

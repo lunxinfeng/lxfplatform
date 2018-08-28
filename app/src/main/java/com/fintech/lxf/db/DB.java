@@ -9,8 +9,8 @@ public class DB {
         return AppDatabase.getInstance(context).userDao().insertUser(user);
     }
 
-    public static User queryLast(Context context,int type,String account){
-        return AppDatabase.getInstance(context).userDao().queryLast(type,account);
+    public static User queryLast(Context context,int type,String account,int mode){
+        return AppDatabase.getInstance(context).userDao().queryLast(type,account,mode);
     }
 
     public static List<User> queryAll(Context context, int type,String account){

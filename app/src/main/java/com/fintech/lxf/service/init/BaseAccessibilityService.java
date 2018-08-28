@@ -35,8 +35,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -60,6 +62,9 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
     public static int offsetTotal = 5;
     public static final int TYPE_ALI = 1;
     public static final int TYPE_WeChat = 2;
+    public static boolean singleMode = false;
+    public static LinkedList<Integer> singleSet = new LinkedList<>();
+    public static int singleCurr = -1;
     protected String currClass;
     private Lock lock = new ReentrantLock();
     protected LinkedList<User> users = new LinkedList<>();
@@ -263,6 +268,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             user.offset_total = offsetTotal;
             user.qr_str = s;
             user.type = getType();
+            user.mode = singleMode?2:1;
             user.amount = (user.pos_curr * user.multiple - user.offset) / 100.0;
 
             users.offer(user);
@@ -282,6 +288,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             user.offset_total = offsetTotal;
             user.qr_str = null;
             user.type = getType();
+            user.mode = singleMode?2:1;
             user.amount = (user.pos_curr * user.multiple - user.offset) / 100.0;
 
             users.offer(user);
@@ -423,8 +430,22 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
 
         if (posV > endPos) {
             if (getOffsetV() >= offsetTotal - 1) {
-                stop();
-                return true;
+                if (singleMode){
+                    if (singleSet.size() == 0){
+                        stop();
+                        return true;
+                    }else{
+                        singleCurr = singleSet.poll();
+                        startPos = singleCurr;
+                        putPosV(startPos);
+                        endPos = singleCurr;
+                        putOffsetV(0);
+                        return false;
+                    }
+                }else{
+                    stop();
+                    return true;
+                }
             } else {
                 resetPos();
             }

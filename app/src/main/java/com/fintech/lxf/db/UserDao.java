@@ -24,8 +24,8 @@ public interface UserDao {
     @Update
     void updateAll(User... users);
 
-    @Query("SELECT * FROM User WHERE type = :type AND account = :account  ORDER BY `offset` DESC,pos_curr DESC LIMIT 1")
-    User queryLast(int type,String account);
+    @Query("SELECT * FROM User WHERE type = :type AND account = :account AND mode = :mode ORDER BY saveTime DESC LIMIT 1")
+    User queryLast(int type,String account,int mode);
 
     @Query("SELECT * FROM User WHERE type = :type AND account = :account")
     List<User> queryAll(int type,String account);

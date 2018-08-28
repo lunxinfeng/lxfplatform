@@ -27,6 +27,7 @@ public class User {
 
 
     public int type;//1:支付宝  2:微信
+    public int mode = 1;//1:正常模式  2:单额模式
     public String deviceId;//设备id
 
     public long saveTime;
@@ -39,15 +40,18 @@ public class User {
     public String toString() {
         return "User{" +
                 "account='" + account + '\'' +
+                ", amount=" + amount +
+                ", qr_str='" + qr_str + '\'' +
                 ", pos_start=" + pos_start +
                 ", pos_curr=" + pos_curr +
                 ", pos_end=" + pos_end +
-                ", qr_str='" + qr_str + '\'' +
                 ", offset=" + offset +
                 ", offset_total=" + offset_total +
                 ", multiple=" + multiple +
                 ", type=" + type +
+                ", mode=" + mode +
                 ", deviceId='" + deviceId + '\'' +
+                ", saveTime=" + saveTime +
                 '}';
     }
 }

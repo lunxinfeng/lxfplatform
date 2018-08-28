@@ -8,8 +8,13 @@ interface InitContract {
     interface View: BaseView {
         val context: Activity
 
-        fun uploadComplete(success:Boolean)
-        fun serverRefuseUpload()
+        fun uploadComplete(success:Boolean,singleMode:Boolean = false)
+        fun serverRefuseUpload(singleMode:Boolean = false)
+        /**
+         * 单额打码模式
+         */
+        fun singleAmountMode(enter:Boolean)
+        fun addSingleAmount()
     }
 
     interface Presenter: BasePresenter {
