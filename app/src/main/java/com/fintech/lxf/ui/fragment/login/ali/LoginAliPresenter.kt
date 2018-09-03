@@ -3,6 +3,7 @@ package com.fintech.lxf.ui.fragment.login.ali
 import android.arch.lifecycle.LifecycleObserver
 import android.text.TextUtils
 import com.alipay.sdk.app.AuthTask
+import com.fintech.lxf.App
 import com.fintech.lxf.net.ProgressSubscriber
 import com.fintech.lxf.net.ResultEntity
 import com.fintech.lxf.net.SignRequestBody
@@ -47,6 +48,8 @@ class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Pres
                     ali_user_id = uid
                     val request = HashMap<String, String>()
                     request.put("uid", uid)
+                    request.put("app_version", App.getAppContext().packageManager
+                            .getPackageInfo(App.getAppContext().packageName,0).versionCode.toString())
                     service.postAliCode(SignRequestBody(request))
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -61,6 +64,8 @@ class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Pres
                                         request.put("password", password)
                                         request.put("uid", ali_user_id)
                                         request.put("payMethod", "2001")
+                                        request.put("app_version", App.getAppContext().packageManager
+                                                .getPackageInfo(App.getAppContext().packageName,0).versionCode.toString())
                                         service.bindAli(SignRequestBody(request))
                                                 .subscribeOn(Schedulers.io())
                                                 .observeOn(AndroidSchedulers.mainThread())
