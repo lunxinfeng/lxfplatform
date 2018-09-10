@@ -23,6 +23,7 @@
     <string name="wx_accessibility_description">随便截微信辅助</string>
     <string name="upload">上传</string>
     <string name="csv">生成CSV</string>
+    <string name="ali_version">支付宝版本</string>
     <string name="wechat_init">微信随便截</string>
     <string name="ali_login">支付宝登陆</string>
     <string name="input_address">请输入您的服务器地址：</string>

@@ -34,8 +34,10 @@ public class AliPayUI {
 
     /**
      * 设置金额 - 金额
+     *  10.1.30    com.alipay.mobile.ui:id/content
+     *  10.1.32    com.alipay.mobile.antui:id/input_edit
      */
-    public final static String et_content = "com.alipay.mobile.ui:id/content";
+    public static String et_content = "com.alipay.mobile.antui:id/input_edit";
 
     /**
      * 设置金额 - 确定

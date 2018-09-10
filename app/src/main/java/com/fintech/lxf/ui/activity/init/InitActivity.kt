@@ -16,6 +16,7 @@ import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.fintech.lxf.R
 import com.fintech.lxf.R.id.*
 import com.fintech.lxf.base.BaseActivity
@@ -76,6 +77,8 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
         }
         tv_ali_offsetTotal.clickN(7,"进入单额打码模式"){ singleAmountMode(true)}
         floatbutton.setOnClickListener { addSingleAmount() }
+
+        configAliVersion(Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:0)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -85,6 +88,21 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
+            R.id.action_ali_version ->{
+                MaterialDialog(this)
+                        .title(text = "请选择您的支付宝版本")
+                        .listItemsSingleChoice(
+                                items = listOf(
+                                        "低于10.1.32",
+                                        "10.1.32"
+                                ),
+                                initialSelection = Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:0
+                        ){_, index, _ ->
+                            Configuration.putUserInfo(KEY_ALI_VERSION,index.toString())
+                            configAliVersion(index)
+                        }
+                        .show()
+            }
             R.id.action_exit ->{
                 AlertDialog.Builder(this)
                         .setMessage("退出账号时是否清除本地保存的二维码数据？")
@@ -109,6 +127,14 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun configAliVersion(index: Int) {
+        AliPayUI.et_content = when (index) {
+            0 -> "com.alipay.mobile.ui:id/content"
+            1 -> "com.alipay.mobile.antui:id/input_edit"
+            else -> "com.alipay.mobile.antui:id/input_edit"
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
