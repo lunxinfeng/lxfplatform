@@ -18,6 +18,7 @@ interface InitContract {
     }
 
     interface Presenter: BasePresenter {
+        fun getMoreUsedAmount()
         fun startAli()
         fun writeToCSV(type:String)
         fun upload()

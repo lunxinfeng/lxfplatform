@@ -43,6 +43,7 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
+            return
         } else {
             Constants.baseUrl = Configuration.getUserInfoByKey(Constants.KEY_ADDRESS)
         }

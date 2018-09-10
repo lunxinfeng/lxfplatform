@@ -10,6 +10,8 @@ import android.content.Intent
 import android.os.Environment
 import android.os.SystemClock
 import android.provider.Settings
+import android.util.Log
+import com.fintech.lxf.bean.ConstantAmountDto
 import com.fintech.lxf.db.DB
 import com.fintech.lxf.db.User
 import com.fintech.lxf.helper.*
@@ -39,6 +41,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     fun onCreate() {
         updateStartType(view.context.intent)
         SPHelper.getInstance().init(view.context)
+        getMoreUsedAmount()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -50,6 +53,24 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
 
     fun updateStartType(intent: Intent) {
         model.startType = intent.getIntExtra("reStart", 0)
+    }
+
+    override fun getMoreUsedAmount() {
+        val request = HashMap<String, String>()
+        request["mchId"] = Configuration.getUserInfoByKey(Constants.KEY_MCH_ID)
+        service.getMoreUsedAmount(SignRequestBody(request).sign())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : ProgressSubscriber<ResultEntity<List<ConstantAmountDto>>>(view.context){
+                    override fun _onNext(t: ResultEntity<List<ConstantAmountDto>>?) {
+                        BaseAccessibilityService.moreUsedAmount.clear()
+                        t?.result?.forEach { BaseAccessibilityService.moreUsedAmount.offer(it) }
+                    }
+
+                    override fun _onError(error: String?) {
+                        view.showHint(error?:"未知错误")
+                    }
+                })
     }
 
     override fun startAli() {
@@ -106,7 +127,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     override fun getLastFromSql() {
         Observable
                 .create<User> { emitter ->
-                    val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI,Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT),if (BaseAccessibilityService.singleMode)2 else 1)
+                    val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI,Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT),if (BaseAccessibilityService.singleMode) 2 else BaseAccessibilityService.type)
                     if (last != null)
                         emitter.onNext(last)
                     emitter.onComplete()
@@ -138,7 +159,8 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                         model.last = last
                         if (last.pos_curr == BaseAccessibilityService.endPos &&
                                 last.offset == BaseAccessibilityService.offsetTotal - 1 &&
-                                (!BaseAccessibilityService.singleMode || BaseAccessibilityService.singleSet.size == 0)) {
+                                ((!BaseAccessibilityService.singleMode && BaseAccessibilityService.moreUsedAmount.size == 0) ||
+                                        BaseAccessibilityService.singleSet.size == 0)) {
                             if (Configuration.getUserInfoByKey(Constants.KEY_ALLOW_LOAD) == "1")
                                 uploadToServer()
                             else

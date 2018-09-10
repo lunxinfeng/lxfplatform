@@ -1,6 +1,9 @@
 package com.fintech.lxf.net;
 
 
+import com.fintech.lxf.bean.ConstantAmountDto;
+
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Flowable;
@@ -45,6 +48,11 @@ public interface ApiService {
     );
     @POST("/api/auth/uidBinding")
     Observable<ResultEntity<Map<String, String>>> bindAli(
+            @Body SignRequestBody body
+    );
+
+    @POST("/api/terminal/v1/constant/amount")
+    Observable<ResultEntity<List<ConstantAmountDto>>> getMoreUsedAmount(
             @Body SignRequestBody body
     );
 }

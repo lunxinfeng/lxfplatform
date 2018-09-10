@@ -21,6 +21,7 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.fintech.lxf.bean.ConstantAmountDto;
 import com.fintech.lxf.db.DB;
 import com.fintech.lxf.db.User;
 import com.fintech.lxf.helper.AliPayUI;
@@ -57,17 +58,26 @@ import io.reactivex.schedulers.Schedulers;
 import static com.fintech.lxf.helper.ExpansionKt.debug;
 
 public abstract class BaseAccessibilityService extends AccessibilityService {
+    public static final int TYPE_NORMAL = 1;
+    public static final int TYPE_SINGLE = 2;
+    public static final int TYPE_MORE_USED = 3;
+
     public static int startPos = 1;
     public static int endPos = 3000;
     public static int offsetTotal = 5;
     public static final int TYPE_ALI = 1;
     public static final int TYPE_WeChat = 2;
+    public static int type = 1;
     public static boolean singleMode = false;
     public static LinkedList<Integer> singleSet = new LinkedList<>();
     public static int singleCurr = -1;
     protected String currClass;
     private Lock lock = new ReentrantLock();
     protected LinkedList<User> users = new LinkedList<>();
+    public static LinkedList<ConstantAmountDto> moreUsedAmount = new LinkedList<>();
+    public static int startPosNormal = 1;
+    public static int endPosNormal = 3000;
+    public static int offsetNormal = 5;
     protected CompositeDisposable compositeDisposable = new CompositeDisposable();
     protected boolean isFinish = true;
 
@@ -247,7 +257,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         } catch (Exception e) {
             e.printStackTrace();
             clearLocalPic();
-        }finally {
+        } finally {
             posAddAdd();
         }
         return false;
@@ -268,7 +278,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             user.offset_total = offsetTotal;
             user.qr_str = s;
             user.type = getType();
-            user.mode = singleMode?2:1;
+            user.mode = singleMode ? 2 : type;
             user.amount = (user.pos_curr * user.multiple - user.offset) / 100.0;
 
             users.offer(user);
@@ -288,7 +298,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             user.offset_total = offsetTotal;
             user.qr_str = null;
             user.type = getType();
-            user.mode = singleMode?2:1;
+            user.mode = singleMode ? 2 : type;
             user.amount = (user.pos_curr * user.multiple - user.offset) / 100.0;
 
             users.offer(user);
@@ -430,11 +440,11 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
 
         if (posV > endPos) {
             if (getOffsetV() >= offsetTotal - 1) {
-                if (singleMode){
-                    if (singleSet.size() == 0){
+                if (singleMode) {
+                    if (singleSet.size() == 0) {
                         stop();
                         return true;
-                    }else{
+                    } else {
                         singleCurr = singleSet.poll();
                         startPos = singleCurr;
                         putPosV(startPos);
@@ -442,12 +452,34 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                         putOffsetV(0);
                         return false;
                     }
-                }else{
-                    stop();
-                    return true;
+                } else {
+                    if (moreUsedAmount.size() > 0) {
+                        if (type == TYPE_NORMAL){
+                            //第一轮常规码跑完后保存常规码的信息。
+                            startPosNormal = startPos;
+                            endPosNormal = endPos;
+                            offsetNormal = offsetTotal;
+                        }
+                        type = TYPE_MORE_USED;
+                        ConstantAmountDto curr = moreUsedAmount.poll();
+                        int amount = curr.getConstantAmount();
+                        putPosV(amount);
+                        putOffsetV(amount >= startPosNormal && amount <= endPosNormal ? offsetNormal : 0);
+                        endPos = amount;
+                        offsetTotal = curr.getMaxNum();
+                        return false;
+                    } else {
+                        stop();
+                        return true;
+                    }
                 }
             } else {
-                resetPos();
+                if (type == TYPE_MORE_USED){
+                    putPosV(--posV);
+                    offsetAddAdd();
+                }else{
+                    resetPos();
+                }
             }
         }
         return false;
@@ -506,7 +538,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                         SystemClock.sleep(3000);
                         Intent intent = new Intent(BaseAccessibilityService.this, InitActivity.class);
                         BaseAccessibilityService.this.startActivity(intent);
-                        List<User> users = DB.queryAll(BaseAccessibilityService.this, getType(),getAccount());
+                        List<User> users = DB.queryAll(BaseAccessibilityService.this, getType(), getAccount());
                         if (users != null)
                             emitter.onNext(users);
                         emitter.onComplete();
@@ -604,11 +636,11 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onDestroy() {
-        debug(TAG,"服务已被销毁onDestroy");
+        debug(TAG, "服务已被销毁onDestroy");
         super.onDestroy();
     }
 
-    private void saveToCSV(List<User> users){
+    private void saveToCSV(List<User> users) {
         Observable.fromIterable(users)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<User>() {
@@ -635,7 +667,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
 //        compositeDisposable.add(d);
     }
 
-    private void saveToCSV(User user){
+    private void saveToCSV(User user) {
         try {
             CSVWriter csvWriter = getCsvWriter();
             String[] re = new String[]{
@@ -649,6 +681,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             e.printStackTrace();
         }
     }
+
     private CSVWriter getCsvWriter() throws IOException {
         String filePath = Environment.getExternalStorageDirectory() + "/a_match_pay/ali-" + SPHelper.getInstance().getString(AliPayUI.acc) + "-" + getOffsetV() + "-all" + ".txt";
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(filePath, true), "GBK");
