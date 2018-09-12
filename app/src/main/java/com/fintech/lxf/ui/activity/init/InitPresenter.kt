@@ -184,6 +184,9 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                                 uploadToServer()
                             else
                                 view.serverRefuseUpload(BaseAccessibilityService.singleMode)
+                        }else{
+                            if (Configuration.getUserInfoByKey(Constants.KEY_ALLOW_LOAD) != "1")
+                                view.serverRefuseUpload(BaseAccessibilityService.singleMode)
                         }
                     }
 
