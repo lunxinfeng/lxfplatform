@@ -25,6 +25,8 @@ import com.fintech.lxf.bean.ConstantAmountDto;
 import com.fintech.lxf.db.DB;
 import com.fintech.lxf.db.User;
 import com.fintech.lxf.helper.AliPayUI;
+import com.fintech.lxf.helper.ObserverBoolean;
+import com.fintech.lxf.helper.Observerable;
 import com.fintech.lxf.helper.QrCodeParser;
 import com.fintech.lxf.helper.SPHelper;
 import com.fintech.lxf.helper.WechatUI;
@@ -36,10 +38,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -58,16 +58,16 @@ import io.reactivex.schedulers.Schedulers;
 import static com.fintech.lxf.helper.ExpansionKt.debug;
 
 public abstract class BaseAccessibilityService extends AccessibilityService {
-    public static final int TYPE_NORMAL = 1;
-    public static final int TYPE_SINGLE = 2;
-    public static final int TYPE_MORE_USED = 3;
+    public static final int MODE_NORMAL = 1;
+    public static final int MODE_SINGLE = 2;
+    public static final int MODE_MORE_USED = 3;
 
     public static int startPos = 1;
     public static int endPos = 3000;
     public static int offsetTotal = 5;
     public static final int TYPE_ALI = 1;
     public static final int TYPE_WeChat = 2;
-    public static int type = 1;
+    public static int mode = MODE_NORMAL;
     public static boolean singleMode = false;
     public static LinkedList<Integer> singleSet = new LinkedList<>();
     public static int singleCurr = -1;
@@ -79,7 +79,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
     public static int endPosNormal = 3000;
     public static int offsetNormal = 5;
     protected CompositeDisposable compositeDisposable = new CompositeDisposable();
-    protected boolean isFinish = true;
+    public static ObserverBoolean isFinish = new ObserverBoolean(false);
 
     public static final String TAG = BaseAccessibilityService.class.getSimpleName();
 
@@ -183,6 +183,19 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         }
     }
 
+    protected void putEndV(int endV) {
+        switch (getType()) {
+            case TYPE_ALI:
+                SPHelper.getInstance().putInt(AliPayUI.endV, endV);
+                break;
+            case TYPE_WeChat:
+                SPHelper.getInstance().putInt(WechatUI.endV, endV);
+                break;
+            default:
+                throw new RuntimeException("必须是微信或者支付宝");
+        }
+    }
+
     protected void putOffsetV(int offsetV) {
         switch (getType()) {
             case TYPE_ALI:
@@ -278,7 +291,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             user.offset_total = offsetTotal;
             user.qr_str = s;
             user.type = getType();
-            user.mode = singleMode ? 2 : type;
+            user.mode = mode;
             user.amount = (user.pos_curr * user.multiple - user.offset) / 100.0;
 
             users.offer(user);
@@ -298,7 +311,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             user.offset_total = offsetTotal;
             user.qr_str = null;
             user.type = getType();
-            user.mode = singleMode ? 2 : type;
+            user.mode = mode;
             user.amount = (user.pos_curr * user.multiple - user.offset) / 100.0;
 
             users.offer(user);
@@ -441,6 +454,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         if (posV > endPos) {
             if (getOffsetV() >= offsetTotal - 1) {
                 if (singleMode) {
+                    mode = MODE_SINGLE;
                     if (singleSet.size() == 0) {
                         stop();
                         return true;
@@ -449,23 +463,19 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                         startPos = singleCurr;
                         putPosV(startPos);
                         endPos = singleCurr;
+                        putEndV(endPos);
                         putOffsetV(0);
                         return false;
                     }
                 } else {
                     if (moreUsedAmount.size() > 0) {
-                        if (type == TYPE_NORMAL){
-                            //第一轮常规码跑完后保存常规码的信息。
-                            startPosNormal = startPos;
-                            endPosNormal = endPos;
-                            offsetNormal = offsetTotal;
-                        }
-                        type = TYPE_MORE_USED;
+                        mode = MODE_MORE_USED;
                         ConstantAmountDto curr = moreUsedAmount.poll();
                         int amount = curr.getConstantAmount();
                         putPosV(amount);
                         putOffsetV(amount >= startPosNormal && amount <= endPosNormal ? offsetNormal : 0);
                         endPos = amount;
+                        putEndV(endPos);
                         offsetTotal = curr.getMaxNum();
                         return false;
                     } else {
@@ -474,7 +484,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                     }
                 }
             } else {
-                if (type == TYPE_MORE_USED){
+                if (mode == MODE_MORE_USED){
                     putPosV(--posV);
                     offsetAddAdd();
                 }else{
@@ -559,7 +569,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                     public void onNext(final List<User> users) {
                         saveToCSV(users);
                         Log.d(TAG, "onNext: 程序初始化完毕,共存储数据 " + users.size());
-                        isFinish = true;
+                        isFinish.set(true);
 //                        showResult(users);
                     }
 
@@ -572,7 +582,6 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
                     @Override
                     public void onComplete() {
                         compositeDisposable.dispose();
-                        disableSelf();
                     }
                 });
     }

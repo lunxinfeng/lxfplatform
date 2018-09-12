@@ -20,6 +20,7 @@ import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.fintech.lxf.R
 import com.fintech.lxf.R.id.*
 import com.fintech.lxf.base.BaseActivity
+import com.fintech.lxf.db.User
 import com.fintech.lxf.helper.*
 import com.fintech.lxf.net.Configuration
 import com.fintech.lxf.net.Constants
@@ -54,14 +55,21 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
 
         lifecycle.addObserver(prestener)
 
-        et_ali_startPos.onChange { BaseAccessibilityService.startPos = it?.toString()?.toIntOrNull() ?: 1 }
-        et_ali_total.onChange { BaseAccessibilityService.endPos = it?.toString()?.toIntOrNull() ?: 3000 }
+        et_ali_startPos.onChange {
+            BaseAccessibilityService.startPos = it?.toString()?.toIntOrNull() ?: 1
+            BaseAccessibilityService.startPosNormal = BaseAccessibilityService.startPos
+        }
+        et_ali_total.onChange {
+            BaseAccessibilityService.endPos = it?.toString()?.toIntOrNull() ?: 3000
+            BaseAccessibilityService.endPosNormal = BaseAccessibilityService.endPos
+        }
         et_ali_offsetTotal.onChange {
             BaseAccessibilityService.offsetTotal = it?.toString()?.toIntOrNull() ?: 5
             if (BaseAccessibilityService.offsetTotal>50){
                 BaseAccessibilityService.offsetTotal = 50
                 et_ali_offsetTotal.setText("50")
             }
+            BaseAccessibilityService.offsetNormal = BaseAccessibilityService.offsetTotal
         }
 
         btnAli.setOnClickListener { prestener.startAli() }
@@ -88,13 +96,16 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
+            R.id.action_upload ->{
+                prestener.stopAndUpload()
+            }
             R.id.action_ali_version ->{
                 MaterialDialog(this)
                         .title(text = "请选择您的支付宝版本")
                         .listItemsSingleChoice(
                                 items = listOf(
                                         "低于10.1.32",
-                                        "10.1.32"
+                                        "高于10.1.32"
                                 ),
                                 initialSelection = Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:0
                         ){_, index, _ ->
@@ -127,6 +138,18 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun stopAndUpload(users: List<User>) {
+        MaterialDialog(this)
+                .title(text = "停止截图并上传")
+                .message(text = "共打码${users.size}条，最后一条金额为${if (users.isNotEmpty()) users[0].amount else 0}，是否停止打码并上传？")
+                .positiveButton(text = "确定"){
+                    BaseAccessibilityService.isFinish.set(true)
+                    prestener.uploadToServer()
+                }
+                .negativeButton(text = "取消")
+                .show()
     }
 
     private fun configAliVersion(index: Int) {

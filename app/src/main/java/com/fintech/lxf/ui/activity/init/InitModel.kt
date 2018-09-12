@@ -48,6 +48,13 @@ class InitModel {
         } else
             last?.pos_end ?: BaseAccessibilityService.endPos
 
+        //恢复常用码状态
+        BaseAccessibilityService.mode = last?.mode?:BaseAccessibilityService.MODE_NORMAL
+        if (BaseAccessibilityService.mode == BaseAccessibilityService.MODE_MORE_USED){
+            BaseAccessibilityService.endPos = last!!.pos_end
+            BaseAccessibilityService.offsetTotal = last!!.offset_total
+        }
+
         SPHelper.getInstance().putString(AliPayUI.acc, acc)
         SPHelper.getInstance().putInt(AliPayUI.posV, pos)
         SPHelper.getInstance().putInt(AliPayUI.startV, pos)
@@ -99,7 +106,7 @@ class InitModel {
 //
 //            val index = if (i == n && !test) 10000 else i
 //            val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/ali-" +
-//                    Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT) + "-" + i + "-all" + type
+//                    Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT) + "-" + i + "-all" + mode
 //            val writer = CSVWriter(OutputStreamWriter(FileOutputStream(filePath, true), "GBK"))
 //
 //            users_

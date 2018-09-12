@@ -347,7 +347,7 @@ public class WechatAccessibilityService extends BaseAccessibilityService {
                             reStartNum = 0;
                         } else {
                             long currTime = System.currentTimeMillis();
-                            User last = DB.queryLast(WechatAccessibilityService.this, TYPE_WeChat,getAccount(),singleMode?2:1);
+                            User last = DB.queryLast(WechatAccessibilityService.this, TYPE_WeChat,getAccount());
                             if (last != null) {
                                 long lastTime = last.saveTime;
                                 if (currTime - Math.max(lastTime, lastReStart) > 30 * 1000) {

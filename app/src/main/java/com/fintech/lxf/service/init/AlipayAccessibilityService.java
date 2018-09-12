@@ -38,7 +38,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        isFinish = false;
+        isFinish.set(false);
         if (!isNonNormal(event)) {
             parserEvent(event);
             lastType = event.getEventType();
@@ -46,13 +46,16 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
     }
 
     private boolean isNonNormal(AccessibilityEvent event) {//会打开两次设置金额页面
-        return lastType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && lastSteep == 5
+        if (lastType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && lastSteep == 5
                 && event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
-                && event.getClassName().toString().equals("com.alipay.mobile.payee.ui.PayeeQRActivity")
+                && event.getClassName().toString().equals("com.alipay.mobile.payee.ui.PayeeQRActivity")){
 
-                ||
+            //重启有可能卡在二维码页面 因为重启收到TYPE_WINDOW_CONTENT_CHANGED
+            lastType = -1;
 
-                lastType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && lastSteep == 0
+            return true;
+        }
+        return lastType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && lastSteep == 0
                         && event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
                         && event.getClassName().toString().equals("com.alipay.mobile.payee.ui.PayeeQRActivity")
                 ;
@@ -232,6 +235,13 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
     @Override
     public void onCreate() {
         super.onCreate();
+        isFinish.addListener(new com.fintech.lxf.helper.Observer<Boolean>() {
+            @Override
+            public void update(Boolean oldValue, Boolean newValue) {
+                if (newValue)
+                    disableSelf();
+            }
+        });
         lastReStart = System.currentTimeMillis();
         db();
     }
@@ -262,7 +272,7 @@ public class AlipayAccessibilityService extends BaseAccessibilityService {
                             reStartNum = 0;
                         } else {
                             long currTime = System.currentTimeMillis();
-                            User last = DB.queryLast(AlipayAccessibilityService.this, TYPE_ALI,getAccount(),singleMode?2:1);
+                            User last = DB.queryLast(AlipayAccessibilityService.this, TYPE_ALI,getAccount());
                             long lastTime = last == null ? 0 : last.saveTime;
                             if (currTime - Math.max(lastTime, lastReStart) > 30 * 1000) {
                                 lastReStart = currTime;

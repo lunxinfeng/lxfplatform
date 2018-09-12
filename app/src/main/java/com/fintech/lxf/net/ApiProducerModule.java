@@ -28,8 +28,8 @@ public class ApiProducerModule {
             final OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
             try {
-                builder.connectTimeout(60, TimeUnit.SECONDS)
-                        .readTimeout(60, TimeUnit.SECONDS)
+                builder.connectTimeout(120, TimeUnit.SECONDS)
+                        .readTimeout(120, TimeUnit.SECONDS)
 //                        .sslSocketFactory(HttpsUtil.getSSLSocketFactory(), new HttpsUtil.MyX509TrustManager())
 //                        .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())
 //                        .hostnameVerifier(new HostnameVerifier() {

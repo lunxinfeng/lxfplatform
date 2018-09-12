@@ -4,7 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.support.annotation.NonNull;
 
-@Entity(primaryKeys = {"account", "pos_curr", "offset", "type"})
+@Entity(primaryKeys = {"account", "pos_curr", "offset", "mode"})
 public class User {
 
     @NonNull
@@ -48,7 +48,7 @@ public class User {
                 ", offset=" + offset +
                 ", offset_total=" + offset_total +
                 ", multiple=" + multiple +
-                ", type=" + type +
+                ", mode=" + type +
                 ", mode=" + mode +
                 ", deviceId='" + deviceId + '\'' +
                 ", saveTime=" + saveTime +

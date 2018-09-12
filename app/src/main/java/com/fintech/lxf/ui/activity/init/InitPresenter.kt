@@ -24,6 +24,7 @@ import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -56,19 +57,37 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     }
 
     override fun getMoreUsedAmount() {
+        val obervable_1 = Observable
+                .create<User> { emitter ->
+                    val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI, Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
+                    if (last != null)
+                        emitter.onNext(last)
+                    emitter.onComplete()
+                }
         val request = HashMap<String, String>()
         request["mchId"] = Configuration.getUserInfoByKey(Constants.KEY_MCH_ID)
-        service.getMoreUsedAmount(SignRequestBody(request).sign())
+        val obervable_2 = service.getMoreUsedAmount(SignRequestBody(request).sign())
+        Observable
+                .zip(obervable_1, obervable_2, BiFunction<User?, ResultEntity<List<ConstantAmountDto>>?, LinkedList<ConstantAmountDto>> { t1, t2 ->
+                    BaseAccessibilityService.moreUsedAmount.clear()
+                    t2.result
+                            ?.filter {
+                                t1.mode != BaseAccessibilityService.MODE_MORE_USED
+                                        || it.constantAmount > t1.pos_curr
+                            }
+                            ?.forEach { BaseAccessibilityService.moreUsedAmount.offer(it) }
+
+                    BaseAccessibilityService.moreUsedAmount
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : ProgressSubscriber<ResultEntity<List<ConstantAmountDto>>>(view.context){
-                    override fun _onNext(t: ResultEntity<List<ConstantAmountDto>>?) {
-                        BaseAccessibilityService.moreUsedAmount.clear()
-                        t?.result?.forEach { BaseAccessibilityService.moreUsedAmount.offer(it) }
+                .subscribe(object : ProgressSubscriber<LinkedList<ConstantAmountDto>>(view.context) {
+                    override fun _onNext(t: LinkedList<ConstantAmountDto>) {
+
                     }
 
                     override fun _onError(error: String?) {
-                        view.showHint(error?:"未知错误")
+                        view.showHint(error ?: "未知错误")
                     }
                 })
     }
@@ -98,17 +117,17 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
         Utils.launchAlipayAPP(view.context)
     }
 
-    override fun writeToCSV(type:String) {
+    override fun writeToCSV(type: String) {
         Single
                 .create(SingleOnSubscribe<List<User>> { emitter ->
                     model.delLocalCSV()
-                    val users = DB.queryAll(view.context, BaseAccessibilityService.TYPE_ALI,Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
+                    val users = DB.queryAll(view.context, BaseAccessibilityService.TYPE_ALI, Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
                     if (users != null)
                         emitter.onSuccess(users)
                 })
                 .subscribeOn(Schedulers.io())
                 .subscribe { users ->
-                    model.writeToCSV(users,type,true)
+                    model.writeToCSV(users, type, true)
                 }
     }
 
@@ -127,7 +146,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     override fun getLastFromSql() {
         Observable
                 .create<User> { emitter ->
-                    val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI,Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT),if (BaseAccessibilityService.singleMode) 2 else BaseAccessibilityService.type)
+                    val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI, Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
                     if (last != null)
                         emitter.onNext(last)
                     emitter.onComplete()
@@ -149,7 +168,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                                     SystemClock.sleep(1000)
                                     startAli()
                                 }
-                            },20*1000)
+                            }, 20 * 1000)
                         }
                     }
                     model.startType = 0
@@ -174,11 +193,32 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                 })
     }
 
-    private fun uploadToServer() {
+    override fun stopAndUpload() {
+        Observable
+                .create<List<User>> { emitter ->
+                    val users = DB.queryAll(view.context, BaseAccessibilityService.TYPE_ALI, Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
+                    if (users != null)
+                        emitter.onNext(users)
+                    emitter.onComplete()
+                }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : ProgressSubscriber<List<User>>(view.context) {
+                    override fun _onNext(users: List<User>) {
+                        view.stopAndUpload(users)
+                    }
+
+                    override fun _onError(error: String) {
+                        view.showHint(error)
+                    }
+                })
+    }
+
+    fun uploadToServer() {
         Observable
                 .create<List<User>> { emitter ->
                     model.delLocalCSV()
-                    val users = DB.queryAll(view.context, BaseAccessibilityService.TYPE_ALI,Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
+                    val users = DB.queryAll(view.context, BaseAccessibilityService.TYPE_ALI, Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
                     if (users != null)
                         emitter.onNext(users)
                     emitter.onComplete()
@@ -217,7 +257,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                         if (t.string().contains("success")) {
                             if (!BaseAccessibilityService.singleMode)
                                 Configuration.putUserInfo(Constants.KEY_ALLOW_LOAD, "-1")
-                            view.uploadComplete(true,BaseAccessibilityService.singleMode)
+                            view.uploadComplete(true, BaseAccessibilityService.singleMode)
                         } else
                             view.uploadComplete(false)
 

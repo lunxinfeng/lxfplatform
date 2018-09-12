@@ -3,6 +3,7 @@ package com.fintech.lxf.ui.activity.init
 import android.app.Activity
 import com.fintech.lxf.base.BaseView
 import com.fintech.lxf.base.BasePresenter
+import com.fintech.lxf.db.User
 
 interface InitContract {
     interface View: BaseView {
@@ -15,6 +16,7 @@ interface InitContract {
          */
         fun singleAmountMode(enter:Boolean)
         fun addSingleAmount()
+        fun stopAndUpload(users:List<User>)
     }
 
     interface Presenter: BasePresenter {
@@ -23,6 +25,7 @@ interface InitContract {
         fun writeToCSV(type:String)
         fun upload()
         fun getLastFromSql()
+        fun stopAndUpload()
         /**
          * @param clear 是否清除本地数据
          */
