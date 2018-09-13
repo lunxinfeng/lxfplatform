@@ -18,8 +18,8 @@ import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.fintech.lxf.R
-import com.fintech.lxf.R.id.*
 import com.fintech.lxf.base.BaseActivity
+import com.fintech.lxf.bean.MoreUsedBean
 import com.fintech.lxf.db.User
 import com.fintech.lxf.helper.*
 import com.fintech.lxf.net.Configuration
@@ -36,6 +36,7 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
         get() = this
     private val prestener = InitPresenter(this)
     private val adapter = SingleAmountAdapter(R.layout.item_single_amount)
+    private val adapterMoreUsed = MoreUsedAdapter(R.layout.item_single_amount)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,10 +84,15 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
             layoutManager = GridLayoutManager(this@InitActivity,3)
             adapter = this@InitActivity.adapter
         }
+
+        recyclerView_more_used.apply {
+            layoutManager = GridLayoutManager(this@InitActivity,3)
+            adapter = this@InitActivity.adapterMoreUsed
+        }
         tv_ali_offsetTotal.clickN(7,"进入单额打码模式"){ singleAmountMode(true)}
         floatbutton.setOnClickListener { addSingleAmount() }
 
-        configAliVersion(Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:0)
+        configAliVersion(Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:1)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -107,7 +113,7 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
                                         "低于10.1.32",
                                         "高于10.1.32"
                                 ),
-                                initialSelection = Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:0
+                                initialSelection = Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:1
                         ){_, index, _ ->
                             Configuration.putUserInfo(KEY_ALI_VERSION,index.toString())
                             configAliVersion(index)
@@ -191,6 +197,16 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
         btnAli.isEnabled = false
     }
 
+    override fun showMoreUsedAmount(data: List<MoreUsedBean>) {
+        adapterMoreUsed.setNewData(data)
+    }
+
+    override fun updateMoreUsedAmount(curr: Int) {
+        adapterMoreUsed.data
+                .forEach { it.complete = it.amount<curr }
+        adapterMoreUsed.notifyDataSetChanged()
+    }
+
     @SuppressLint("RestrictedApi")
     override fun singleAmountMode(enter: Boolean) {
         BaseAccessibilityService.singleMode = enter
@@ -210,6 +226,7 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
         et_ali_offsetTotal.isEnabled = enter
         floatbutton.visibility = if (enter) View.VISIBLE else View.GONE
         recyclerView.visibility = if (enter) View.VISIBLE else View.GONE
+        recyclerView_more_used.visibility = if (enter) View.GONE else View.VISIBLE
     }
 
     override fun addSingleAmount() {

@@ -4,13 +4,14 @@ import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.fintech.lxf.R
 
 
-class Label(context: Context,attrs: AttributeSet): LinearLayout(context,attrs) {
+class Label(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs) {
     private val textView = TextView(context)
     private val image = ImageView(context)
 
@@ -22,11 +23,11 @@ class Label(context: Context,attrs: AttributeSet): LinearLayout(context,attrs) {
             gravity = Gravity.CENTER
             setTextColor(Color.WHITE)
             textSize = 18f
-            val param = LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT,1f)
+            val param = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             layoutParams = param
         }
         image.apply {
-            val param = LinearLayout.LayoutParams(48,48)
+            val param = LinearLayout.LayoutParams(48, 48)
             layoutParams = param
             setImageResource(R.mipmap.close)
             setOnClickListener { onRemoveListener?.onRemove(text) }
@@ -52,9 +53,15 @@ class Label(context: Context,attrs: AttributeSet): LinearLayout(context,attrs) {
             textView.setTextColor(value)
         }
 
-    var onRemoveListener:OnRemoveListener? = null
+    var closeEnabled = true
+        set(value) {
+            field = value
+            image.visibility = if (value) View.VISIBLE else View.GONE
+        }
 
-    interface OnRemoveListener{
-        fun onRemove(content:String)
+    var onRemoveListener: OnRemoveListener? = null
+
+    interface OnRemoveListener {
+        fun onRemove(content: String)
     }
 }

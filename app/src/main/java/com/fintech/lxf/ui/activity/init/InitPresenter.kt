@@ -12,6 +12,7 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
 import com.fintech.lxf.bean.ConstantAmountDto
+import com.fintech.lxf.bean.MoreUsedBean
 import com.fintech.lxf.db.DB
 import com.fintech.lxf.db.User
 import com.fintech.lxf.helper.*
@@ -62,28 +63,35 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                     val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI, Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
                     if (last != null)
                         emitter.onNext(last)
+                    else
+                        emitter.onNext(User())
                     emitter.onComplete()
                 }
         val request = HashMap<String, String>()
         request["mchId"] = Configuration.getUserInfoByKey(Constants.KEY_MCH_ID)
         val obervable_2 = service.getMoreUsedAmount(SignRequestBody(request).sign())
         Observable
-                .zip(obervable_1, obervable_2, BiFunction<User?, ResultEntity<List<ConstantAmountDto>>?, LinkedList<ConstantAmountDto>> { t1, t2 ->
+                .zip(obervable_1, obervable_2, BiFunction<User?, ResultEntity<List<ConstantAmountDto>>?, List<MoreUsedBean>> { lastUser, t2 ->
                     BaseAccessibilityService.moreUsedAmount.clear()
+                    val list = mutableListOf<MoreUsedBean>()
                     t2.result
                             ?.filter {
-                                t1.mode != BaseAccessibilityService.MODE_MORE_USED
-                                        || it.constantAmount > t1.pos_curr
+                                val result = lastUser.account.isEmpty()
+                                        || lastUser.mode != BaseAccessibilityService.MODE_MORE_USED
+                                        || it.constantAmount > lastUser.pos_curr
+
+                                list.add(MoreUsedBean(it.constantAmount, !result))
+                                result
                             }
                             ?.forEach { BaseAccessibilityService.moreUsedAmount.offer(it) }
 
-                    BaseAccessibilityService.moreUsedAmount
+                    list
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : ProgressSubscriber<LinkedList<ConstantAmountDto>>(view.context) {
-                    override fun _onNext(t: LinkedList<ConstantAmountDto>) {
-
+                .subscribe(object : ProgressSubscriber<List<MoreUsedBean>>(view.context) {
+                    override fun _onNext(t: List<MoreUsedBean>) {
+                        view.showMoreUsedAmount(t)
                     }
 
                     override fun _onError(error: String?) {
@@ -184,9 +192,13 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                                 uploadToServer()
                             else
                                 view.serverRefuseUpload(BaseAccessibilityService.singleMode)
-                        }else{
+                        } else {
                             if (Configuration.getUserInfoByKey(Constants.KEY_ALLOW_LOAD) != "1")
                                 view.serverRefuseUpload(BaseAccessibilityService.singleMode)
+                        }
+
+                        if (last.mode == BaseAccessibilityService.MODE_MORE_USED){
+                            view.updateMoreUsedAmount(last.pos_curr)
                         }
                     }
 

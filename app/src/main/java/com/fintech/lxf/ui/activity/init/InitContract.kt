@@ -3,6 +3,7 @@ package com.fintech.lxf.ui.activity.init
 import android.app.Activity
 import com.fintech.lxf.base.BaseView
 import com.fintech.lxf.base.BasePresenter
+import com.fintech.lxf.bean.MoreUsedBean
 import com.fintech.lxf.db.User
 
 interface InitContract {
@@ -11,6 +12,8 @@ interface InitContract {
 
         fun uploadComplete(success:Boolean,singleMode:Boolean = false)
         fun serverRefuseUpload(singleMode:Boolean = false)
+        fun showMoreUsedAmount(data:List<MoreUsedBean>)
+        fun updateMoreUsedAmount(curr:Int)
         /**
          * 单额打码模式
          */
