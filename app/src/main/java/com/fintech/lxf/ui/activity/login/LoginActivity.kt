@@ -4,27 +4,28 @@ import android.content.Intent
 import android.os.Bundle
 import com.fintech.lxf.R
 import com.fintech.lxf.base.BaseActivity
+import com.fintech.lxf.helper.Utils
 import com.fintech.lxf.helper.clickN
-import com.fintech.lxf.net.Configuration
 import com.fintech.lxf.net.Constants
-import com.fintech.lxf.ui.activity.config.ConfigActivity
 import com.fintech.lxf.ui.fragment.login.account.LoginAccountFragment
 import com.fintech.lxf.ui.fragment.login.ali.LoginAliFragment
 import kotlinx.android.synthetic.main.activity_login2.*
+import pub.devrel.easypermissions.AfterPermissionGranted
+import pub.devrel.easypermissions.EasyPermissions
 
-class LoginActivity : BaseActivity() {
+class LoginActivity : BaseActivity(), EasyPermissions.PermissionCallbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login2)
 
-        if (Configuration.noAddress()) {
-            startActivity(Intent(this,ConfigActivity::class.java))
-            finish()
-            return
-        } else {
-            Constants.baseUrl = Configuration.getUserInfoByKey(Constants.KEY_ADDRESS)
-        }
+//        if (Configuration.noAddress()) {
+//            startActivity(Intent(this,ConfigActivity::class.java))
+//            finish()
+//            return
+//        } else {
+//            Constants.baseUrl = Configuration.getUserInfoByKey(Constants.KEY_ADDRESS)
+//        }
 
         fragmentManager
                 .beginTransaction()
@@ -45,5 +46,33 @@ class LoginActivity : BaseActivity() {
             fragment.back()
         else
             super.onBackPressed()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requestAllPermission()
+    }
+
+    @AfterPermissionGranted(Constants.ALL_PERMISSION)
+    fun requestAllPermission() {
+        if (!EasyPermissions.hasPermissions(this, *Constants.PERMISSIONS_GROUP)) {
+            EasyPermissions.requestPermissions(this, this.getString(R.string.rationale_message),
+                    Constants.ALL_PERMISSION, *Constants.PERMISSIONS_GROUP)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: List<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            Utils.goPermissionSetting(this)
+        }
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+
     }
 }

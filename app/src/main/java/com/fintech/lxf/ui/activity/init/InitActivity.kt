@@ -26,6 +26,7 @@ import com.fintech.lxf.net.Configuration
 import com.fintech.lxf.net.Constants
 import com.fintech.lxf.net.Constants.*
 import com.fintech.lxf.service.init.BaseAccessibilityService
+import com.fintech.lxf.ui.activity.config.ConfigActivity
 import com.fintech.lxf.ui.activity.login.LoginActivity
 import kotlinx.android.synthetic.main.activity_init.*
 import pub.devrel.easypermissions.AfterPermissionGranted
@@ -47,9 +48,10 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
             startActivity(intent)
             finish()
             return
-        } else {
-            Constants.baseUrl = Configuration.getUserInfoByKey(Constants.KEY_ADDRESS)
         }
+//        else {
+//            Constants.baseUrl = Configuration.getUserInfoByKey(Constants.KEY_ADDRESS)
+//        }
 
         setSupportActionBar(toolbar)
         toolbar.inflateMenu(R.menu.menu_init)
@@ -91,6 +93,7 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
         }
         tv_ali_offsetTotal.clickN(7,"进入单额打码模式"){ singleAmountMode(true)}
         floatbutton.setOnClickListener { addSingleAmount() }
+        toolbar.clickN(10,"进入地址配置页面"){startActivity(Intent(this,ConfigActivity::class.java))}
 
         configAliVersion(Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:1)
     }
