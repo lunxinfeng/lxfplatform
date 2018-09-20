@@ -75,6 +75,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                     BaseAccessibilityService.moreUsedAmount.clear()
                     val list = mutableListOf<MoreUsedBean>()
                     t2.result
+                            ?.sortedBy { it.constantAmount }
                             ?.filter {
                                 val result = lastUser.account.isEmpty()
                                         || lastUser.mode != BaseAccessibilityService.MODE_MORE_USED
