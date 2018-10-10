@@ -19,6 +19,7 @@ import com.fintech.lxf.helper.*
 import com.fintech.lxf.net.*
 import com.fintech.lxf.service.init.AlipayAccessibilityService
 import com.fintech.lxf.service.init.BaseAccessibilityService
+import com.fintech.lxf.service.init.WechatAccessibilityService
 import com.fintech.lxf.ui.activity.login.LoginActivity
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -38,6 +39,8 @@ import java.util.concurrent.TimeUnit
 class InitPresenter(val view: InitContract.View) : InitContract.Presenter, LifecycleObserver {
     override val compositeDisposable = CompositeDisposable()
     private val model = InitModel()
+
+    var isAli = true
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
@@ -126,6 +129,31 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
         Utils.launchAlipayAPP(view.context)
     }
 
+    override fun startWechat() {
+        val accessibilitySettingsOn = AccessibilityHelper.isAccessibilitySettingsOn(view.context, WechatAccessibilityService::class.java)
+        if (!accessibilitySettingsOn) {
+            AlertDialog.Builder(view.context)
+                    .setMessage("请先打开微信辅助插件。")
+                    .setCancelable(false)
+                    .setPositiveButton("去打开") { _, _ ->
+                        view.context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    }
+                    .setNegativeButton("取消") { _, _ ->
+                    }
+                    .show()
+            return
+        }
+
+        model.reStart()
+
+        val filePath = Environment.getExternalStorageDirectory().toString() + "/a_match_pay/"
+        val file = File(filePath)
+        if (!file.exists()) {
+            file.mkdir()
+        }
+        Utils.launchWechatAPP(view.context)
+    }
+
     override fun writeToCSV(type: String) {
         Single
                 .create(SingleOnSubscribe<List<User>> { emitter ->
@@ -155,7 +183,8 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     override fun getLastFromSql() {
         Observable
                 .create<User> { emitter ->
-                    val last = DB.queryLast(view.context, BaseAccessibilityService.TYPE_ALI, Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
+                    val last = DB.queryLast(view.context, if (isAli) BaseAccessibilityService.TYPE_ALI else BaseAccessibilityService.TYPE_WeChat,
+                            Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
                     if (last != null)
                         emitter.onNext(last)
                     emitter.onComplete()
@@ -167,15 +196,21 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
                 .doOnComplete {
                     when (model.startType) {
                         InitModel.STRAT_TYPE_ERROR_NORMAL -> {
-                            startAli()
+                            if (isAli)
+                                startAli()
+                            else
+                                startWechat()
                         }
                         InitModel.STRAT_TYPE_KILL_BACKGROUND -> {
                             Timer().schedule(object : TimerTask() {
                                 override fun run() {
                                     val am = view.context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                                    am.killBackgroundProcesses("com.eg.android.AlipayGphone")
+                                    am.killBackgroundProcesses(if (isAli) "com.eg.android.AlipayGphone" else "com.tencent.mm")
                                     SystemClock.sleep(1000)
-                                    startAli()
+                                    if (isAli)
+                                        startAli()
+                                    else
+                                        startWechat()
                                 }
                             }, 20 * 1000)
                         }

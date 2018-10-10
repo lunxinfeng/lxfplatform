@@ -63,7 +63,7 @@ public class WechatUI {
 
 
         //步骤
-    public static volatile int steep = -2;
+    public static volatile int steep = 0;
     public static String getPicPath() {
         String dcim_path = Environment.getExternalStorageDirectory().getAbsolutePath();
         return dcim_path + "/tencent/MicroMsg/WeiXin/";

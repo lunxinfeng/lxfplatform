@@ -25,6 +25,7 @@ interface InitContract {
     interface Presenter: BasePresenter {
         fun getMoreUsedAmount()
         fun startAli()
+        fun startWechat()
         fun writeToCSV(type:String)
         fun upload()
         fun getLastFromSql()

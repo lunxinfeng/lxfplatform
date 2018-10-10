@@ -378,32 +378,21 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         input(0);
     }
 
-    public void input(int num) {
-        num++;
-        if (num > 2)
-            return;
+    public void input(int reStartNum) {
         AccessibilityNodeInfo root = getRootInActiveWindow();
         if (root == null) {
-            final int finalNum = num;
-            Single.timer(200, TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Long>() {
-                        @Override
-                        public void accept(Long aLong) throws Exception {
-                            input(finalNum);
-                        }
-                    });
+            reStartNum++;
+            SystemClock.sleep(500);
+            if (reStartNum < 3)
+                input(reStartNum);
             return;
         }
         List<AccessibilityNodeInfo> etContent = root.findAccessibilityNodeInfosByViewId(amount_et());
         if (etContent == null || etContent.size() == 0) {
-            final int finalNum1 = num;
-            Single.timer(200, TimeUnit.MILLISECONDS)
-                    .subscribe(new Consumer<Long>() {
-                        @Override
-                        public void accept(Long aLong) throws Exception {
-                            input(finalNum1);
-                        }
-                    });
+            reStartNum++;
+            SystemClock.sleep(2000);
+            if (reStartNum < 3)
+                input(reStartNum);
             return;
         }
         AccessibilityNodeInfo nodeInfo = etContent.get(0);

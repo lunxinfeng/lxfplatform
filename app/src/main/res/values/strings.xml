@@ -24,6 +24,7 @@
     <string name="upload">上传</string>
     <string name="csv">生成CSV</string>
     <string name="stop_upload">停止并上传</string>
+    <string name="switch_">切换打码</string>
     <string name="ali_version">支付宝版本</string>
     <string name="wechat_init">微信随便截</string>
     <string name="ali_login">支付宝登陆</string>

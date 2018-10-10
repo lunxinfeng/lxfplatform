@@ -23,7 +23,6 @@ import com.fintech.lxf.bean.MoreUsedBean
 import com.fintech.lxf.db.User
 import com.fintech.lxf.helper.*
 import com.fintech.lxf.net.Configuration
-import com.fintech.lxf.net.Constants
 import com.fintech.lxf.net.Constants.*
 import com.fintech.lxf.service.init.BaseAccessibilityService
 import com.fintech.lxf.ui.activity.config.ConfigActivity
@@ -76,6 +75,7 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
         }
 
         btnAli.setOnClickListener { prestener.startAli() }
+        btnWechat.setOnClickListener { prestener.startWechat() }
 
         et_ali_account.setText(Configuration.getUserInfoByKey(KEY_ACCOUNT))
         et_ali_startPos.setText(Configuration.getUserInfoByKey(KEY_BEGIN_NUM))
@@ -105,6 +105,11 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
+            R.id.action_switch ->{
+                btnWechat.visibility = if (btnWechat.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+                btnAli.visibility = if (btnAli.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+                prestener.isAli = !prestener.isAli
+            }
             R.id.action_upload ->{
                 prestener.stopAndUpload()
             }

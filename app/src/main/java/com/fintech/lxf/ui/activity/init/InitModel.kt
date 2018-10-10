@@ -6,6 +6,7 @@ import com.fintech.lxf.db.DB
 import com.fintech.lxf.db.User
 import com.fintech.lxf.helper.AliPayUI
 import com.fintech.lxf.helper.SPHelper
+import com.fintech.lxf.helper.WechatUI
 import com.fintech.lxf.net.Configuration
 import com.fintech.lxf.net.Constants
 import com.fintech.lxf.net.Constants.*
@@ -63,6 +64,15 @@ class InitModel {
         SPHelper.getInstance().putInt(AliPayUI.beishuV, beishu)
 
         AliPayUI.steep = 0
+
+
+        SPHelper.getInstance().putString(WechatUI.acc, acc)
+        SPHelper.getInstance().putInt(WechatUI.posV, pos)
+        SPHelper.getInstance().putInt(WechatUI.startV, pos)
+        SPHelper.getInstance().putInt(WechatUI.endV, end)
+        SPHelper.getInstance().putInt(WechatUI.offsetV, offset)
+        SPHelper.getInstance().putInt(WechatUI.beishuV, beishu)
+        WechatUI.steep = 0
     }
 
     fun delLocalCSV() {
