@@ -13,8 +13,11 @@ import android.widget.Button
 import android.widget.EditText
 import com.fintech.lxf.R
 import com.fintech.lxf.base.BaseFragment
+import com.fintech.lxf.helper.METHOD_ALI
+import com.fintech.lxf.helper.METHOD_WECHAT
 import com.fintech.lxf.ui.activity.init.InitActivity
 import com.fintech.lxf.ui.fragment.login.ali.LoginAliFragment
+import kotlinx.android.synthetic.main.fragment_login_account.*
 
 
 class LoginAccountFragment : BaseFragment(),LoginAccountContract.View {
@@ -44,7 +47,8 @@ class LoginAccountFragment : BaseFragment(),LoginAccountContract.View {
         val et_password = view.findViewById<EditText>(R.id.et_password)
         btnBind?.transitionName = "login"
 
-        btnBind?.setOnClickListener { presenter.accountLogin(et_account.text.toString(),et_password.text.toString()) }
+        btnBind?.setOnClickListener { presenter.accountLogin(et_account.text.toString(),et_password.text.toString(),
+                if (rbAli.isSelected) METHOD_ALI else METHOD_WECHAT) }
     }
 
     fun back(){

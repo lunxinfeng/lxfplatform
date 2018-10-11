@@ -18,6 +18,7 @@ import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.fintech.lxf.R
+import com.fintech.lxf.R.id.*
 import com.fintech.lxf.base.BaseActivity
 import com.fintech.lxf.bean.MoreUsedBean
 import com.fintech.lxf.db.User

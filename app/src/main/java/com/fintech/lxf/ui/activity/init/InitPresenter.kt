@@ -269,7 +269,8 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
         Observable
                 .create<List<User>> { emitter ->
                     model.delLocalCSV()
-                    val users = DB.queryAll(view.context, BaseAccessibilityService.TYPE_ALI, Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
+                    val users = DB.queryAll(view.context, if (isAli) BaseAccessibilityService.TYPE_ALI else BaseAccessibilityService.TYPE_WeChat,
+                            Configuration.getUserInfoByKey(Constants.KEY_ACCOUNT))
                     if (users != null)
                         emitter.onNext(users)
                     emitter.onComplete()
@@ -287,7 +288,7 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
 
                     val des = Configuration.getUserInfoByKey(Constants.KEY_USER_NAME)
                     val desBody = RequestBody.create(MediaType.parse("multipart/form-data"), des)
-                    val des2 = "2001"
+                    val des2 = if (isAli) METHOD_ALI else METHOD_WECHAT
                     val desBody2 = RequestBody.create(MediaType.parse("multipart/form-data"), des2)
                     val desBody3 = RequestBody.create(MediaType.parse("multipart/form-data"), path.split(";")[1])
 

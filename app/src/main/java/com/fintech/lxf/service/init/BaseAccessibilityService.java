@@ -265,21 +265,23 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
         Arrays.sort(files);
         try {
             save(files);
-
+            posAddAdd();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
+            Log.w(TAG, "解析图片出错");
             clearLocalPic();
-        } finally {
-            posAddAdd();
         }
+//        finally {
+//            posAddAdd();
+//        }
         return false;
     }
 
     //存入数据库
     public void save(final File[] files) throws Exception {
         String s;
-        try {
+//        try {
             s = decodeImg(files[0]);
             User user = new User();
             user.account = SPHelper.getInstance().getString(AliPayUI.acc);
@@ -298,27 +300,27 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
 //            long id = DB.insert(this, user);
 //            debug(TAG, "save: s = " + s);
 //            debug(TAG, "save: id = " + id);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.w(TAG, "解析图片出错");
-            User user = new User();
-            user.account = SPHelper.getInstance().getString(AliPayUI.acc);
-            user.offset = getOffsetV();
-            user.multiple = getbeishu();
-            user.pos_curr = getPosV();
-            user.pos_end = getEndV();
-            user.pos_start = startPos;
-            user.offset_total = offsetTotal;
-            user.qr_str = null;
-            user.type = getType();
-            user.mode = mode;
-            user.amount = (user.pos_curr * user.multiple - user.offset) / 100.0;
-
-            users.offer(user);
-//            long id = DB.insert(this, user);
-//            debug(TAG, "save: s = " + null);
-//            debug(TAG, "save: id = " + id);
-        }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            Log.w(TAG, "解析图片出错");
+//            User user = new User();
+//            user.account = SPHelper.getInstance().getString(AliPayUI.acc);
+//            user.offset = getOffsetV();
+//            user.multiple = getbeishu();
+//            user.pos_curr = getPosV();
+//            user.pos_end = getEndV();
+//            user.pos_start = startPos;
+//            user.offset_total = offsetTotal;
+//            user.qr_str = null;
+//            user.type = getType();
+//            user.mode = mode;
+//            user.amount = (user.pos_curr * user.multiple - user.offset) / 100.0;
+//
+//            users.offer(user);
+////            long id = DB.insert(this, user);
+////            debug(TAG, "save: s = " + null);
+////            debug(TAG, "save: id = " + id);
+//        }
     }
 
 

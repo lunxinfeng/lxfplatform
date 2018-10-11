@@ -45,7 +45,9 @@ class LoginAliFragment : BaseFragment(),LoginAliContract.View {
         fragment.sharedElementReturnTransition = Fade()
 
         val btnLoginAli = view.findViewById<Button>(R.id.btnLoginAli)
+        val btnLoginWechat = view.findViewById<Button>(R.id.btnLoginWechat)
         btnLoginAli.setOnClickListener { presenter.aliLogin() }
+        btnLoginWechat.setOnClickListener { presenter.wechatLogin() }
     }
 
     companion object {

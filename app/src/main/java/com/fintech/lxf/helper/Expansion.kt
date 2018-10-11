@@ -17,6 +17,9 @@ import java.util.concurrent.TimeUnit
 
 var DEBUG = true
 
+const val METHOD_WECHAT = "1001"
+const val METHOD_ALI = "2001"
+
 fun Activity.toActivity(clazz: Class<*>) = startActivity(Intent(this,clazz))
 
 fun Context.toast(msg: String, duration: Int = Toast.LENGTH_SHORT) = Toast.makeText(applicationContext, msg, duration).show()

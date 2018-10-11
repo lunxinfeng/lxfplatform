@@ -14,11 +14,11 @@ import java.util.HashMap
 class LoginAccountPresenter(val view: LoginAccountContract.View) : LoginAccountContract.Presenter, LifecycleObserver {
     private val model = LoginModel()
 
-    override fun accountLogin(name:String,password:String) {
+    override fun accountLogin(name:String,password:String,type:String) {
         val request = HashMap<String, String>()
         request.put("userName", name)
         request.put("password", password)
-        request.put("payMethod", "2001")
+        request.put("payMethod", type)
         request.put("app_version", App.getAppContext().packageManager
                 .getPackageInfo(App.getAppContext().packageName,0).versionCode.toString())
         login(request)

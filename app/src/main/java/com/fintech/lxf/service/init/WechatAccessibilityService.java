@@ -47,6 +47,7 @@ public class WechatAccessibilityService extends BaseAccessibilityService {
 //            parserEvent(event);
 //            lastType = event.getEventType();
 //        }
+        isFinish.set(false);
         parserEvent(event);
     }
 
@@ -339,6 +340,13 @@ public class WechatAccessibilityService extends BaseAccessibilityService {
     @Override
     public void onCreate() {
         super.onCreate();
+        isFinish.addListener(new com.fintech.lxf.helper.Observer<Boolean>() {
+            @Override
+            public void update(Boolean oldValue, Boolean newValue) {
+                if (newValue)
+                    disableSelf();
+            }
+        });
         db();
     }
 

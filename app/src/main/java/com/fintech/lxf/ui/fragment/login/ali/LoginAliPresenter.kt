@@ -4,6 +4,7 @@ import android.arch.lifecycle.LifecycleObserver
 import android.text.TextUtils
 import com.alipay.sdk.app.AuthTask
 import com.fintech.lxf.App
+import com.fintech.lxf.helper.METHOD_ALI
 import com.fintech.lxf.net.ProgressSubscriber
 import com.fintech.lxf.net.ResultEntity
 import com.fintech.lxf.net.SignRequestBody
@@ -63,7 +64,7 @@ class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Pres
                                         request.put("userName", name)
                                         request.put("password", password)
                                         request.put("uid", ali_user_id)
-                                        request.put("payMethod", "2001")
+                                        request.put("payMethod", METHOD_ALI)
                                         request.put("app_version", App.getAppContext().packageManager
                                                 .getPackageInfo(App.getAppContext().packageName,0).versionCode.toString())
                                         service.bindAli(SignRequestBody(request))
@@ -104,6 +105,10 @@ class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Pres
                     }
 
                 })
+    }
+
+    override fun wechatLogin() {
+
     }
 
     override val compositeDisposable = CompositeDisposable()

@@ -101,7 +101,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:theme="@style/ToolbarPopupTheme"
-        app:title="@string/init_ali"
+        app:title="@string/init_title"
         app:titleTextColor="@color/white" />
 
     <TextView

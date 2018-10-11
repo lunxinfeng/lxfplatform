@@ -14,5 +14,6 @@ interface LoginAliContract {
 
     interface Presenter: BasePresenter {
         fun aliLogin()
+        fun wechatLogin()
     }
 }

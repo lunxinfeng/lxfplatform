@@ -13,6 +13,6 @@ interface LoginAccountContract {
     }
 
     interface Presenter: BasePresenter {
-        fun accountLogin(name:String,password:String)
+        fun accountLogin(name:String,password:String,type:String)
     }
 }
