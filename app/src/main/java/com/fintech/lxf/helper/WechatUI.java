@@ -39,9 +39,11 @@ public class WechatUI {
     //二维码收款
     public final static String page_CollectMainUI = "com.tencent.mm.plugin.collect.ui.CollectMainUI";
 
-    public final static String et_bx = "com.tencent.mm:id/bx";
+//    public final static String et_bx = "com.tencent.mm:id/bx";
+    public final static String et_bx = "com.tencent.mm:id/cs";
 
-    public final static String btn_sure = "com.tencent.mm:id/alr"; //确定
+    public final static String btn_sure = "com.tencent.mm:id/ast"; //确定
+//    public final static String btn_sure = "com.tencent.mm:id/alr"; //确定
     public final static String btn_save = "com.tencent.mm:id/amb"; //保存图片
     public final static String btn_set = "com.tencent.mm:id/ama"; //清除金额 设置金额
 

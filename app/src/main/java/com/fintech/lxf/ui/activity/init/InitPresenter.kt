@@ -1,7 +1,6 @@
 package com.fintech.lxf.ui.activity.init
 
 import android.app.ActivityManager
-import android.app.AlertDialog
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
@@ -10,7 +9,7 @@ import android.content.Intent
 import android.os.Environment
 import android.os.SystemClock
 import android.provider.Settings
-import android.util.Log
+import com.afollestad.materialdialogs.MaterialDialog
 import com.fintech.lxf.bean.ConstantAmountDto
 import com.fintech.lxf.bean.MoreUsedBean
 import com.fintech.lxf.db.DB
@@ -40,10 +39,11 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     override val compositeDisposable = CompositeDisposable()
     private val model = InitModel()
 
-    var isAli = true
+    private var isAli = true
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
+        isAli = loginType == METHOD_ALI
         updateStartType(view.context.intent)
         SPHelper.getInstance().init(view.context)
         getMoreUsedAmount()
@@ -107,14 +107,12 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     override fun startAli() {
         val accessibilitySettingsOn = AccessibilityHelper.isAccessibilitySettingsOn(view.context, AlipayAccessibilityService::class.java)
         if (!accessibilitySettingsOn) {
-            AlertDialog.Builder(view.context)
-                    .setMessage("请先打开支付宝辅助插件。")
-                    .setCancelable(false)
-                    .setPositiveButton("去打开") { _, _ ->
+            MaterialDialog(view.context)
+                    .message(text = "请先打开支付宝辅助插件。")
+                    .positiveButton(text = "去打开"){
                         view.context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                     }
-                    .setNegativeButton("取消") { _, _ ->
-                    }
+                    .negativeButton(text = "取消")
                     .show()
             return
         }
@@ -132,14 +130,12 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     override fun startWechat() {
         val accessibilitySettingsOn = AccessibilityHelper.isAccessibilitySettingsOn(view.context, WechatAccessibilityService::class.java)
         if (!accessibilitySettingsOn) {
-            AlertDialog.Builder(view.context)
-                    .setMessage("请先打开微信辅助插件。")
-                    .setCancelable(false)
-                    .setPositiveButton("去打开") { _, _ ->
+            MaterialDialog(view.context)
+                    .message(text = "请先打开微信辅助插件。")
+                    .positiveButton(text = "去打开"){
                         view.context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                     }
-                    .setNegativeButton("取消") { _, _ ->
-                    }
+                    .negativeButton(text = "取消")
                     .show()
             return
         }
@@ -169,14 +165,13 @@ class InitPresenter(val view: InitContract.View) : InitContract.Presenter, Lifec
     }
 
     override fun upload() {
-        AlertDialog.Builder(view.context)
-                .setMessage("确认要上传本地数据吗？")
-                .setCancelable(false)
-                .setPositiveButton("确认") { _, _ ->
+        MaterialDialog(view.context)
+                .apply { setCancelable(false) }
+                .message(text = "确认要上传本地数据吗？")
+                .positiveButton(text = "确认"){
                     uploadToServer()
                 }
-                .setNegativeButton("取消") { _, _ ->
-                }
+                .negativeButton(text = "取消")
                 .show()
     }
 

@@ -11,6 +11,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
+import com.fintech.lxf.service.init.BaseAccessibilityService
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import java.util.concurrent.TimeUnit
@@ -19,6 +20,9 @@ var DEBUG = true
 
 const val METHOD_WECHAT = "1001"
 const val METHOD_ALI = "2001"
+
+var loginType = METHOD_ALI
+
 
 fun Activity.toActivity(clazz: Class<*>) = startActivity(Intent(this,clazz))
 

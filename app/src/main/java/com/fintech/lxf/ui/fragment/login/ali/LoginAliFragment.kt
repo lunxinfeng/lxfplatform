@@ -47,7 +47,13 @@ class LoginAliFragment : BaseFragment(),LoginAliContract.View {
         val btnLoginAli = view.findViewById<Button>(R.id.btnLoginAli)
         val btnLoginWechat = view.findViewById<Button>(R.id.btnLoginWechat)
         btnLoginAli.setOnClickListener { presenter.aliLogin() }
-        btnLoginWechat.setOnClickListener { presenter.wechatLogin() }
+        btnLoginWechat.setOnClickListener {
+//            presenter.wechatLogin()
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.frame_content, LoginAccountFragment.newInstance())
+                    .commit()
+        }
     }
 
     companion object {

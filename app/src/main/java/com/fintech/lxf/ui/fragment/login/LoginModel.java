@@ -5,8 +5,10 @@ import android.content.Context;
 
 
 import com.fintech.lxf.db.DB;
+import com.fintech.lxf.helper.ExpansionKt;
 import com.fintech.lxf.net.Configuration;
 
+import java.security.cert.Extension;
 import java.util.Map;
 
 import io.reactivex.Single;
@@ -44,5 +46,6 @@ public class LoginModel {
         Configuration.putUserInfo(KEY_BEGIN_NUM, result.get(KEY_BEGIN_NUM));
         Configuration.putUserInfo(KEY_END_NUM, result.get(KEY_END_NUM));
         Configuration.putUserInfo(KEY_MAX_NUM, result.get(KEY_MAX_NUM));
+        Configuration.putUserInfo(KEY_LOGIN_TYPE, ExpansionKt.getLoginType());
     }
 }

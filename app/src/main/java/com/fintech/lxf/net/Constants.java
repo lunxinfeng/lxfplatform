@@ -36,6 +36,7 @@ public class Constants {
     public static final String KEY_END_NUM = "endNum";
     public static final String KEY_MAX_NUM = "maxNum";
     public static final String KEY_ALI_VERSION = "aliVersion";
+    public static final String KEY_LOGIN_TYPE = "loginType";
 
 
 }

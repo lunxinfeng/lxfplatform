@@ -398,7 +398,7 @@ public abstract class BaseAccessibilityService extends AccessibilityService {
             return;
         }
         AccessibilityNodeInfo nodeInfo = etContent.get(0);
-
+        debug(TAG, "onAccessibilityEvent: input: " + getAmount() + "===");
         performEditText(nodeInfo, getAmount() + "");
     }
 

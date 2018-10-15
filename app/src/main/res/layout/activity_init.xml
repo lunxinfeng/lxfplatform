@@ -22,7 +22,7 @@
         android:hint="@string/account"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintStart_toEndOf="@+id/tv_account"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <!--<EditText-->
@@ -56,11 +56,11 @@
 
     <Button
         android:id="@+id/btnAli"
-        style="@style/button_primary_dark"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/start_ali"
+        style="@style/button_primary_dark"
         app:layout_constraintEnd_toEndOf="@+id/et_ali_offsetTotal"
         app:layout_constraintStart_toStartOf="@+id/tv_ali_offsetTotal"
         app:layout_constraintTop_toBottomOf="@+id/et_ali_offsetTotal" />
@@ -95,8 +95,8 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
         android:minHeight="50dp"
+        android:background="?attr/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -105,10 +105,10 @@
         app:titleTextColor="@color/white" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tv_account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="40dp"
         android:text="支付宝账号："
         android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/et_ali_account"
@@ -121,8 +121,7 @@
         android:text="起始金额："
         android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/et_ali_startPos"
-        app:layout_constraintEnd_toEndOf="@+id/textView"
-        app:layout_constraintStart_toStartOf="@+id/textView" />
+        app:layout_constraintStart_toStartOf="@+id/tv_account" />
 
     <TextView
         android:id="@+id/textView3"
@@ -131,7 +130,6 @@
         android:text="结束金额："
         android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/et_ali_total"
-        app:layout_constraintEnd_toEndOf="@+id/tv_start_amount"
         app:layout_constraintStart_toStartOf="@+id/tv_start_amount" />
 
     <TextView
@@ -141,7 +139,6 @@
         android:text="并发数量："
         android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/et_ali_offsetTotal"
-        app:layout_constraintEnd_toEndOf="@+id/textView3"
         app:layout_constraintStart_toStartOf="@+id/textView3" />
 
     <android.support.v7.widget.RecyclerView
@@ -177,19 +174,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/btnWechat"
-        style="@style/button_primary_dark"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/start_wechat"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_ali_offsetTotal" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView_more_used"

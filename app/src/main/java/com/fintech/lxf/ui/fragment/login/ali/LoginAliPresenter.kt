@@ -4,6 +4,7 @@ import android.arch.lifecycle.LifecycleObserver
 import android.text.TextUtils
 import com.alipay.sdk.app.AuthTask
 import com.fintech.lxf.App
+import com.fintech.lxf.R
 import com.fintech.lxf.helper.METHOD_ALI
 import com.fintech.lxf.net.ProgressSubscriber
 import com.fintech.lxf.net.ResultEntity
@@ -11,6 +12,7 @@ import com.fintech.lxf.net.SignRequestBody
 import com.fintech.lxf.ui.activity.login.AuthResult
 import com.fintech.lxf.ui.fragment.login.LoginModel
 import com.fintech.lxf.ui.dlg.BindDialog
+import com.fintech.lxf.ui.fragment.login.account.LoginAccountFragment
 import io.reactivex.functions.Function
 import io.reactivex.Observable
 import io.reactivex.ObservableSource

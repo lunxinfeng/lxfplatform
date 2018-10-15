@@ -2,6 +2,7 @@ package com.fintech.lxf.ui.fragment.login.account
 
 import android.arch.lifecycle.LifecycleObserver
 import com.fintech.lxf.App
+import com.fintech.lxf.helper.loginType
 import com.fintech.lxf.net.ProgressSubscriber
 import com.fintech.lxf.net.ResultEntity
 import com.fintech.lxf.net.SignRequestBody
@@ -21,6 +22,8 @@ class LoginAccountPresenter(val view: LoginAccountContract.View) : LoginAccountC
         request.put("payMethod", type)
         request.put("app_version", App.getAppContext().packageManager
                 .getPackageInfo(App.getAppContext().packageName,0).versionCode.toString())
+
+        loginType = type
         login(request)
     }
 

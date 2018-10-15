@@ -48,7 +48,7 @@ class LoginAccountFragment : BaseFragment(),LoginAccountContract.View {
         btnBind?.transitionName = "login"
 
         btnBind?.setOnClickListener { presenter.accountLogin(et_account.text.toString(),et_password.text.toString(),
-                if (rbAli.isSelected) METHOD_ALI else METHOD_WECHAT) }
+                if (rbAli.isChecked) METHOD_ALI else METHOD_WECHAT) }
     }
 
     fun back(){

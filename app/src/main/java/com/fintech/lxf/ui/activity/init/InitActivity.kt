@@ -40,6 +40,11 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
     private val adapterMoreUsed = MoreUsedAdapter(R.layout.item_single_amount)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        loginType = Configuration.getUserInfoByKey(KEY_LOGIN_TYPE)
+        when(loginType){
+            METHOD_ALI -> setTheme(R.style.App_Ali)
+            METHOD_WECHAT -> setTheme(R.style.App_WeChat)
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_init)
 
@@ -58,6 +63,17 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
 
         lifecycle.addObserver(prestener)
 
+        when(loginType){
+            METHOD_ALI -> {
+                tv_account.text = "支付宝账号："
+                btnAli.text = "启动支付宝"
+            }
+            METHOD_WECHAT -> {
+                tv_account.text = "微信账号："
+                btnAli.text = "启动微信"
+            }
+        }
+
         et_ali_startPos.onChange {
             BaseAccessibilityService.startPos = it?.toString()?.toIntOrNull() ?: 1
             BaseAccessibilityService.startPosNormal = BaseAccessibilityService.startPos
@@ -75,8 +91,12 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
             BaseAccessibilityService.offsetNormal = BaseAccessibilityService.offsetTotal
         }
 
-        btnAli.setOnClickListener { prestener.startAli() }
-        btnWechat.setOnClickListener { prestener.startWechat() }
+        btnAli.setOnClickListener {
+            when(loginType){
+                METHOD_ALI -> prestener.startAli()
+                METHOD_WECHAT -> prestener.startWechat()
+            }
+        }
 
         et_ali_account.setText(Configuration.getUserInfoByKey(KEY_ACCOUNT))
         et_ali_startPos.setText(Configuration.getUserInfoByKey(KEY_BEGIN_NUM))
@@ -96,7 +116,7 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
         floatbutton.setOnClickListener { addSingleAmount() }
         toolbar.clickN(10,"进入地址配置页面"){startActivity(Intent(this,ConfigActivity::class.java))}
 
-        configAliVersion(Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:1)
+//        configAliVersion(Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:1)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -106,47 +126,47 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
-            R.id.action_switch ->{
-                btnWechat.visibility = if (btnWechat.visibility == View.VISIBLE) View.GONE else View.VISIBLE
-                btnAli.visibility = if (btnAli.visibility == View.VISIBLE) View.GONE else View.VISIBLE
-                prestener.isAli = !prestener.isAli
-            }
+//            R.id.action_switch ->{
+//                btnWechat.visibility = if (btnWechat.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+//                btnAli.visibility = if (btnAli.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+//                prestener.isAli = !prestener.isAli
+//            }
             R.id.action_upload ->{
                 prestener.stopAndUpload()
             }
-            R.id.action_ali_version ->{
-                MaterialDialog(this)
-                        .title(text = "请选择您的支付宝版本")
-                        .listItemsSingleChoice(
-                                items = listOf(
-                                        "低于10.1.32",
-                                        "高于10.1.32"
-                                ),
-                                initialSelection = Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:1
-                        ){_, index, _ ->
-                            Configuration.putUserInfo(KEY_ALI_VERSION,index.toString())
-                            configAliVersion(index)
-                        }
-                        .show()
-            }
+//            R.id.action_ali_version ->{
+//                MaterialDialog(this)
+//                        .title(text = "请选择您的支付宝版本")
+//                        .listItemsSingleChoice(
+//                                items = listOf(
+//                                        "低于10.1.32",
+//                                        "高于10.1.32"
+//                                ),
+//                                initialSelection = Configuration.getUserInfoByKey(KEY_ALI_VERSION).toIntOrNull()?:1
+//                        ){_, index, _ ->
+//                            Configuration.putUserInfo(KEY_ALI_VERSION,index.toString())
+//                            configAliVersion(index)
+//                        }
+//                        .show()
+//            }
             R.id.action_exit ->{
-                AlertDialog.Builder(this)
-                        .setMessage("退出账号时是否清除本地保存的二维码数据？")
-                        .setPositiveButton("清除") { _, _ ->
+                MaterialDialog(this)
+                        .message(text = "退出账号时是否清除本地保存的二维码数据？")
+                        .positiveButton(text = "清除"){
                             prestener.exitAccount(true)
                         }
-                        .setNegativeButton("保留") { _, _ ->
+                        .negativeButton(text = "保留"){
                             prestener.exitAccount(false)
                         }
                         .show()
             }
             R.id.action_csv ->{
-                AlertDialog.Builder(this)
-                        .setMessage("生成本地文件")
-                        .setPositiveButton("生成csv") { _, _ ->
+                MaterialDialog(this)
+                        .message(text = "生成本地文件")
+                        .positiveButton(text = "生成csv"){
                             prestener.writeToCSV(".csv")
                         }
-                        .setNegativeButton("生成txt") { _, _ ->
+                        .negativeButton(text = "生成txt"){
                             prestener.writeToCSV(".txt")
                         }
                         .show()
@@ -167,13 +187,13 @@ class InitActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,InitCon
                 .show()
     }
 
-    private fun configAliVersion(index: Int) {
-        AliPayUI.et_content = when (index) {
-            0 -> "com.alipay.mobile.ui:id/content"
-            1 -> "com.alipay.mobile.antui:id/input_edit"
-            else -> "com.alipay.mobile.antui:id/input_edit"
-        }
-    }
+//    private fun configAliVersion(index: Int) {
+//        AliPayUI.et_content = when (index) {
+//            0 -> "com.alipay.mobile.ui:id/content"
+//            1 -> "com.alipay.mobile.antui:id/input_edit"
+//            else -> "com.alipay.mobile.antui:id/input_edit"
+//        }
+//    }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
