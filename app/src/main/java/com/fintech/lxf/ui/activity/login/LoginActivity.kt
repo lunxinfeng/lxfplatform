@@ -1,5 +1,6 @@
 package com.fintech.lxf.ui.activity.login
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.fintech.lxf.R
@@ -8,7 +9,7 @@ import com.fintech.lxf.helper.Utils
 import com.fintech.lxf.helper.clickN
 import com.fintech.lxf.net.Constants
 import com.fintech.lxf.ui.fragment.login.account.LoginAccountFragment
-import com.fintech.lxf.ui.fragment.login.ali.LoginAliFragment
+import com.fintech.lxf.ui.fragment.login.ali_wx.LoginAliFragment
 import kotlinx.android.synthetic.main.activity_login2.*
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
@@ -38,6 +39,17 @@ class LoginActivity : BaseActivity(), EasyPermissions.PermissionCallbacks {
                     .replace(R.id.frame_content,LoginAccountFragment.newInstance())
                     .commit()
         }
+
+        getAllApps(this)
+    }
+
+    fun getAllApps(context: Context) {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        val pm = context.packageManager
+
+        val list =  pm.queryIntentActivities(intent, 0)
+        list.forEach { println("${it.activityInfo.packageName}\t${it.loadLabel(pm)}") }
     }
 
     override fun onBackPressed() {

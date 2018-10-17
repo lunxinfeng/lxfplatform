@@ -1,4 +1,4 @@
-package com.fintech.lxf.ui.fragment.login.ali
+package com.fintech.lxf.ui.fragment.login.ali_wx
 
 import android.app.Activity
 import com.fintech.lxf.base.BaseView

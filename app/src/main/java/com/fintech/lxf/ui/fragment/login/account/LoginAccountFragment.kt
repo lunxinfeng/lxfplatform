@@ -3,7 +3,6 @@ package com.fintech.lxf.ui.fragment.login.account
 
 import android.app.Activity
 import android.os.Bundle
-import android.app.Fragment
 import android.content.Intent
 import android.transition.Fade
 import android.view.LayoutInflater
@@ -16,7 +15,7 @@ import com.fintech.lxf.base.BaseFragment
 import com.fintech.lxf.helper.METHOD_ALI
 import com.fintech.lxf.helper.METHOD_WECHAT
 import com.fintech.lxf.ui.activity.init.InitActivity
-import com.fintech.lxf.ui.fragment.login.ali.LoginAliFragment
+import com.fintech.lxf.ui.fragment.login.ali_wx.LoginAliFragment
 import kotlinx.android.synthetic.main.fragment_login_account.*
 
 

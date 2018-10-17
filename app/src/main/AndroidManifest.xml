@@ -50,14 +50,16 @@
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
 
-
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessible_service_config_wx" />
         </service>
 
         <activity android:name=".ui.activity.config.ConfigActivity" />
-        <activity android:name=".ui.activity.login.LoginActivity" />
+        <activity android:name=".ui.activity.login.LoginActivity" android:launchMode="singleTask"/>
+        <activity android:name="com.fintech.match.pay_2.wxapi.WXEntryActivity"
+            android:theme="@style/App_WXEntry"
+            android:exported="true"/>
     </application>
 
 </manifest>

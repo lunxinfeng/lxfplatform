@@ -1,15 +1,13 @@
-package com.fintech.lxf.ui.fragment.login.ali
+package com.fintech.lxf.ui.fragment.login.ali_wx
 
 import android.app.Activity
 import android.os.Bundle
-import android.app.Fragment
 import android.content.Intent
 import android.transition.Fade
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
 import com.fintech.lxf.R
 import com.fintech.lxf.base.BaseFragment
 import com.fintech.lxf.ui.activity.init.InitActivity
@@ -48,11 +46,11 @@ class LoginAliFragment : BaseFragment(),LoginAliContract.View {
         val btnLoginWechat = view.findViewById<Button>(R.id.btnLoginWechat)
         btnLoginAli.setOnClickListener { presenter.aliLogin() }
         btnLoginWechat.setOnClickListener {
-//            presenter.wechatLogin()
-            fragmentManager
-                    .beginTransaction()
-                    .replace(R.id.frame_content, LoginAccountFragment.newInstance())
-                    .commit()
+            presenter.wechatLogin()
+//            fragmentManager
+//                    .beginTransaction()
+//                    .replace(R.id.frame_content, LoginAccountFragment.newInstance())
+//                    .commit()
         }
     }
 

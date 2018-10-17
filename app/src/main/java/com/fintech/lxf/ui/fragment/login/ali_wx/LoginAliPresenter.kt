@@ -1,18 +1,22 @@
-package com.fintech.lxf.ui.fragment.login.ali
+package com.fintech.lxf.ui.fragment.login.ali_wx
 
 import android.arch.lifecycle.LifecycleObserver
 import android.text.TextUtils
 import com.alipay.sdk.app.AuthTask
 import com.fintech.lxf.App
-import com.fintech.lxf.R
 import com.fintech.lxf.helper.METHOD_ALI
+import com.fintech.lxf.helper.loginType
 import com.fintech.lxf.net.ProgressSubscriber
 import com.fintech.lxf.net.ResultEntity
 import com.fintech.lxf.net.SignRequestBody
 import com.fintech.lxf.ui.activity.login.AuthResult
 import com.fintech.lxf.ui.fragment.login.LoginModel
 import com.fintech.lxf.ui.dlg.BindDialog
-import com.fintech.lxf.ui.fragment.login.account.LoginAccountFragment
+import com.tencent.mm.opensdk.modelbase.BaseReq
+import com.tencent.mm.opensdk.modelbase.BaseResp
+import com.tencent.mm.opensdk.modelmsg.SendAuth
+import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler
+import com.tencent.mm.opensdk.openapi.WXAPIFactory
 import io.reactivex.functions.Function
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
@@ -22,7 +26,8 @@ import io.reactivex.schedulers.Schedulers
 import java.lang.Exception
 import java.util.HashMap
 
-class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Presenter, LifecycleObserver {
+class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Presenter
+        , LifecycleObserver {
     private val model = LoginModel()
     private var ali_user_id = ""
     override fun aliLogin() {
@@ -47,14 +52,14 @@ class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Pres
                     }
                 })
                 .observeOn(Schedulers.io())
-                .flatMap(Function<String, ObservableSource<ResultEntity<Map<String, String>>>> { uid ->
+                .flatMap { uid ->
                     ali_user_id = uid
                     val request = HashMap<String, String>()
-                    request.put("uid", uid)
-                    request.put("app_version", App.getAppContext().packageManager
-                            .getPackageInfo(App.getAppContext().packageName,0).versionCode.toString())
+                    request["uid"] = uid
+                    request["app_version"] = App.getAppContext().packageManager
+                            .getPackageInfo(App.getAppContext().packageName,0).versionCode.toString()
                     service.postAliCode(SignRequestBody(request))
-                })
+                }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : ProgressSubscriber<ResultEntity<Map<String, String>>>(view.context){
                     override fun _onNext(s: ResultEntity<Map<String, String>>) {
@@ -79,6 +84,8 @@ class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Pres
                                                             view.loginFail(resultEntity.subMsg?:resultEntity.msg)
                                                             return
                                                         }
+
+                                                        loginType = METHOD_ALI
                                                         model.saveData(result)
 
                                                         view.loginSuccess()
@@ -95,6 +102,7 @@ class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Pres
                             "10000" -> {
                                 val result = s.result
 
+                                loginType = METHOD_ALI
                                 model.saveData(result)
 
                                 view.loginSuccess()
@@ -110,7 +118,12 @@ class LoginAliPresenter(val view: LoginAliContract.View) : LoginAliContract.Pres
     }
 
     override fun wechatLogin() {
+        val api = WXAPIFactory.createWXAPI(view.context,WX_APPID,true)
+        api.registerApp(WX_APPID)
 
+        val req = SendAuth.Req()
+        req.scope = "snsapi_userinfo"
+        api.sendReq(req)
     }
 
     override val compositeDisposable = CompositeDisposable()
